@@ -16,7 +16,7 @@ const OpenQuestionNodeProperties = () => {
         platform={['WebApp']}
         activityDescription="In this activity learners will answer to an Open Question"
       />
-      
+
       <Button
         marginBottom={'5px'}
         id="buttonAI"

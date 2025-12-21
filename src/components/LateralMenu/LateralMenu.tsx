@@ -69,7 +69,7 @@ const configAssessment = [
 ];
 */
 
-//In our case we had multiple nodes that weren't already implemented in execution phase, 
+//In our case we had multiple nodes that weren't already implemented in execution phase,
 //so we decided to show them but not allowing the usage, you can remove this list and the corresponding logic if not needed.
 
 const listImplementedNodes = [
@@ -94,10 +94,7 @@ const ITEM_COLORS = ['#FFCC49', '#FFF0C8'];
 const LateralMenu = ({ isOpen }: LateralMenuProps) => {
   if (!isOpen) return <></>;
 
-  const onDragStart = (
-    event: DragEvent<HTMLDivElement>,
-    nodeType: string
-  ) => {
+  const onDragStart = (event: DragEvent<HTMLDivElement>, nodeType: string) => {
     if (!event.dataTransfer) return;
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
@@ -113,19 +110,14 @@ const LateralMenu = ({ isOpen }: LateralMenuProps) => {
   }));
 
   return (
-    <Box
-      w="300px"
-      backgroundColor="rgba(217, 217, 217, 0.6)"
-    >
+    <Box w="300px" backgroundColor="rgba(217, 217, 217, 0.6)">
       <div className="label">NEW ACTIVITY</div>
 
       <Box height="100%" overflowY="auto" paddingBottom="15%">
         {nodes.map((node, idx) => {
-          const isEnabled =
-            listImplementedNodes.includes(node.index);
+          const isEnabled = listImplementedNodes.includes(node.index);
 
-          const bgColor =
-            ITEM_COLORS[idx % ITEM_COLORS.length];
+          const bgColor = ITEM_COLORS[idx % ITEM_COLORS.length];
 
           return (
             <Box
@@ -147,20 +139,13 @@ const LateralMenu = ({ isOpen }: LateralMenuProps) => {
                   : 'Node type not implemented yet'
               }
               onDragStart={(event) =>
-                isEnabled
-                  ? onDragStart(event, node.index)
-                  : null
+                isEnabled ? onDragStart(event, node.index) : null
               }
               _hover={{
                 backgroundColor: isEnabled ? '#e6b83f' : bgColor,
               }}
             >
-              <Image
-                alt="Node icon"
-                src={node.icon}
-                width={20}
-                height={20}
-              />
+              <Image alt="Node icon" src={node.icon} width={20} height={20} />
               {node.text}
             </Box>
           );

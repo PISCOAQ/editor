@@ -25,7 +25,7 @@ module.exports = {
     return [
       {
         source: '/',
-        destination: '/flows', // TODO: change if needed 
+        destination: '/flows', // TODO: change if needed
         permanent: true,
       },
     ];

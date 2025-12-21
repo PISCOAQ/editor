@@ -20,7 +20,7 @@ const MultipleChoiceQuestionNodeProperties = () => {
         activityDescription="In this activity learners will have to select the correct answer from
         multiple options provided"
       />
-      
+
       <Button
         marginBottom={'5px'}
         id="buttonAI"
