@@ -84,7 +84,6 @@ const exampleFlows = new Map<string, PolyglotFlow>();
     ),
   ];
 
-
   const lessonNodes: LessonTextNode[] = [
     {
       _id: UUIDv4(),
@@ -93,7 +92,7 @@ const exampleFlows = new Map<string, PolyglotFlow>();
       title: 'Lesson',
       description: 'Some description',
       difficulty: 1,
-      data: {text: '' },
+      data: { text: '' },
       reactFlow: {
         id: UUIDv4(),
         type: 'lessonNode',
@@ -138,7 +137,6 @@ const exampleFlows = new Map<string, PolyglotFlow>();
     },
   ];
 
-
   const unconditionalEdge: UnconditionalEdge[] = [
     {
       _id: UUIDv4(),
@@ -160,11 +158,7 @@ const exampleFlows = new Map<string, PolyglotFlow>();
     },
   ];
 
-
-  const flowEdges: PolyglotEdge[] = [
-    ...passFailEdges,
-    ...unconditionalEdge,
-  ];
+  const flowEdges: PolyglotEdge[] = [...passFailEdges, ...unconditionalEdge];
 
   exampleFlows.set('1', {
     _id: UUIDv4(),

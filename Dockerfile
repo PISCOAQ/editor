@@ -1,18 +1,14 @@
 FROM node:21-alpine
 
 ARG TEST_MODE=false
-ARG DEPLOY_URL=https://staging.polyglot-edu.com
-ARG BACK_URL=https://polyglot-api-staging.polyglot-edu.com
+ARG DEPLOY_URL= #TODO: add your deployment url here
+ARG BACK_URL= #TODO: add your backend url here
 ARG AUTH0_SECRET
 ARG AUTH0_AUDIENCE
 ARG AUTH0_SCOPE
 ARG AUTH0_CLIENT_ID
 ARG AUTH0_CLIENT_SECRET
 ARG AUTH0_ISSUER_BASE_URL
-ARG APIKEY
-ARG SETUPMODEL
-ARG AIGENERATION_URL
-
 
 ARG WORKDIR=web-client
 
@@ -34,10 +30,7 @@ RUN export DEPLOY_URL=${DEPLOY_URL} && \
     export AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID} && \
     export AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET} && \
     export AUTH0_AUDIENCE=${AUTH0_AUDIENCE} && \
-    export AUTH0_SCOPE=${AUTH0_SCOPE} && \
-    export APIKEY=${APIKEY} && \
-    export SETUPMODEL=${SETUPMODEL} && \
-    export AIGENERATION_URL=${AIGENERATION_URL} && \
+    export AUTH0_SCOPE=${AUTH0_SCOPE} &&
     npm run build
 
 CMD npm run start

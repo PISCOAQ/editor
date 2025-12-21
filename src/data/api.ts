@@ -130,7 +130,6 @@ export class APIV2 {
     return this.axios.delete('/api/flows/' + flowId);
   }
 
-
   loadFlowElementsAsync(flowId: string): Promise<AxiosResponse<PolyglotFlow>> {
     return this.axios.get(`/api/flows/${flowId}`);
   }

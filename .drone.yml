@@ -9,14 +9,14 @@ globals:
     password:
       from_secret: docker_password
   - &env
-    AUTH0_SECRET: secret
+    AUTH0_SECRET: secret  #NOTE: AUTHO parameters are just a setup for later use, we didn't integrate auth0 yet, right now it's without login
     AUTH0_ISSUER_BASE_URL: url
     AUTH0_CLIENT_ID: client_id
     AUTH0_CLIENT_SECRET: client_secret
     AUTH0_AUDIENCE: https://api.polyglot-edu.com
     AUTH0_SCOPE: 'openid profile email read:products'
-    DEPLOY_URL: polyglot-edu.com
-    BACK_URL: https://polyglot-api.polyglot-edu.com
+    DEPLOY_URL: #TODO: add your deployment url here
+    BACK_URL: #TODO: add your backend url here
     TEST_MODE: true
   - &condition
     event:
@@ -26,13 +26,13 @@ steps:
   - name: Build and push image to Docker # building the encore docker image
     image: plugins/docker
     settings:
-      repo: docker.polyglot-edu.com/polyglot-edu/node-editor # must be lowercase
-      registry: docker.polyglot-edu.com
+      repo:  # TODO: insert your repository name (must be lowercase, ex: docker.polyglot-edu.com/polyglot-edu/node-editor)
+      registry:  #TODO: insert your registry url (ex: docker.polyglot-edu.com)
       dockerfile: ./Dockerfile
       tags: ['${DRONE_BRANCH}']
       build_args:
-        - 'DEPLOY_URL=polyglot-edu.com'
-        - 'BACK_URL=https://polyglot-api.polyglot-edu.com'
+        - 'DEPLOY_URL=...' #TODO: add your deployment url here
+        - 'BACK_URL=https://...' #TODO: add your backend url here
         - 'TEST_MODE=true'
       <<: *docker_creds
     when:
@@ -48,18 +48,18 @@ steps:
     settings:
       mode: upgrade
       chart: ./charts
-      release: node-editor-${DRONE_BRANCH}
-      namespace: node-editor-${DRONE_BRANCH}
+      release: editor-${DRONE_BRANCH}
+      namespace: editor-${DRONE_BRANCH}
       debug: true
       kube_service_account: admin-user
-      kube_api_server: 'https://131.114.23.149:6443'
+      kube_api_server: 'https://...' #TODO: add your kubernetes api server here
       kube_token:
         from_secret: kube_token
       values:
-        - 'url=polyglot-edu.com'
+        - 'url=...' #TODO: add your deployment url here
         - 'cfOriginKey=$CFORIGIN'
         - 'dockerconfigjson=$DOCKERCONFIG'
-        - 'image.repository=docker.polyglot-edu.com/polyglot-edu/node-editor'
+        - 'image.repository=...' #TODO: add your image repository here (ex: docker.polyglot-edu.com/polyglot-edu/node-editor)
         - 'image.tag=${DRONE_BRANCH}'
         - 'env.authSecret=$AUTH0_SECRET'
         - 'env.authIssuerUrl=$AUTH0_ISSUER_BASE_URL'
@@ -79,7 +79,6 @@ steps:
       <<: *condition
       branch:
         include:
-          - dev #remove it later
           - main
   - name: Deploy Development # deploy to kubernetes using a Helm chart
     image: pelotech/drone-helm3
@@ -96,14 +95,14 @@ steps:
       namespace: node-editor-${DRONE_BRANCH}
       debug: true
       kube_service_account: admin-user
-      kube_api_server: 'https://131.114.23.149:6443'
+      kube_api_server: 'https://...' #TODO: add your kubernetes api server here
       kube_token:
         from_secret: kube_token
       values:
         - 'url=${DRONE_BRANCH}-dashboard.polyglot-edu.com'
         - 'cfOriginKey=$CFORIGIN'
         - 'dockerconfigjson=$DOCKERCONFIG'
-        - 'image.repository=docker.polyglot-edu.com/polyglot-edu/node-editor'
+        - 'image.repository=...' #TODO: add your image repository here (ex: docker.polyglot-edu.com/polyglot-edu/node-editor)
         - 'image.tag=${DRONE_BRANCH}'
         - 'env.authSecret=$AUTH0_SECRET'
         - 'env.authIssuerUrl=$AUTH0_ISSUER_BASE_URL'
@@ -123,5 +122,4 @@ steps:
       <<: *condition
       branch:
         exclude:
-          - dev #remove it later
           - main

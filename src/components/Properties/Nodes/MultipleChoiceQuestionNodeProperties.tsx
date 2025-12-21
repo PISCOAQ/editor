@@ -2,7 +2,6 @@ import { Button, SkeletonText, useDisclosure } from '@chakra-ui/react';
 import { useState } from 'react';
 import MultipleChoiceField from '../../Forms/Fields/MultipleChoiceField';
 import TextField from '../../Forms/Fields/TextField';
-import AIToolModal from '../../Modals/AIToolModal';
 import NodeProperties from './NodeProperties';
 
 const MultipleChoiceQuestionNodeProperties = () => {
@@ -21,12 +20,7 @@ const MultipleChoiceQuestionNodeProperties = () => {
         activityDescription="In this activity learners will have to select the correct answer from
         multiple options provided"
       />
-      <AIToolModal
-        isOpen={isOpenAITool}
-        onClose={onCloseAITool}
-        exType={'multipleChoiceQuestionNode'}
-        action={setGeneratingLoading}
-      />
+      
       <Button
         marginBottom={'5px'}
         id="buttonAI"

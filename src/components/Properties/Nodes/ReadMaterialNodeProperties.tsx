@@ -3,7 +3,6 @@ import { useState } from 'react';
 import MarkDownField from '../../Forms/Fields/MarkDownField';
 import TextField from '../../Forms/Fields/TextField';
 import FileUploadDownload from '../../Forms/Fields/UploadDownloadField';
-import AIToolModal from '../../Modals/AIToolModal';
 import NodeProperties from './NodeProperties';
 
 const ReadMaterialNodeProperties = () => {
@@ -18,12 +17,6 @@ const ReadMaterialNodeProperties = () => {
       <NodeProperties
         platform={['WebApp']}
         activityDescription="Insert a document URL, input text directly, or or add an existing OER"
-      />
-      <AIToolModal
-        isOpen={isOpenAITool}
-        onClose={onCloseAITool}
-        exType={'ReadMaterialNode'}
-        action={setGeneratingLoading}
       />
       <Button
         marginBottom={'5px'}

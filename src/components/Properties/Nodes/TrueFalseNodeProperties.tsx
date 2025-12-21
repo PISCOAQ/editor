@@ -2,7 +2,6 @@ import { Button, SkeletonText, useDisclosure } from '@chakra-ui/react';
 import { useState } from 'react';
 import TextField from '../../Forms/Fields/TextField';
 import TrueFalseField from '../../Forms/Fields/TrueFalseField';
-import AIToolModal from '../../Modals/AIToolModal';
 import NodeProperties from './NodeProperties';
 
 const TrueFalseNodeProperties = () => {
@@ -18,12 +17,6 @@ const TrueFalseNodeProperties = () => {
         platform={['WebApp']}
         activityDescription="In this activity learners will have to provide answers to true and false
         questions"
-      />
-      <AIToolModal
-        isOpen={isOpenAITool}
-        onClose={onCloseAITool}
-        exType={'TrueFalseNode'}
-        action={setGeneratingLoading}
       />
       <Button
         marginBottom={'5px'}

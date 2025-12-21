@@ -42,7 +42,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { APIV2 } from '../../data/api';
 import { PolyglotFlow, PolyglotFlowInfo } from '../../types/polyglotElements';
-import CreateAILPModal from './CreateAILPModal';
 
 type CreateFlowModalProps = {
   isOpen: boolean;
@@ -77,12 +76,6 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
   const [colorTag, setColorTag] = useState(colors[0]);
   const { isOpen: ioPop, onClose: ocPop, onOpen: opPop } = useDisclosure();
   const [tags, setTags] = useState<{ name: string; color: string }[]>([]);
-
-  const {
-    isOpen: caifOpen,
-    onClose: caifOnClose,
-    onOpen: caifOnOpen,
-  } = useDisclosure();
 
   const toast = useToast();
   const router = useRouter();
@@ -185,16 +178,6 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
               <Tab>Custom</Tab>
               <Tab>Import JSON</Tab>
             </TabList>
-            <Text top={'-100px'} float={'right'} onClick={caifOnOpen}>
-              Create with AI{' '}
-              <IconButton
-                aria-label="Create Flow"
-                isRound={true}
-                height={'30px'}
-                colorScheme="blue"
-                icon={<ViewIcon color="white" />}
-              />
-            </Text>
 
             <TabPanels>
               <TabPanel>
@@ -398,7 +381,6 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
               </TabPanel>
             </TabPanels>
           </Tabs>
-          <CreateAILPModal isOpen={caifOpen} onClose={caifOnClose} />
         </ModalBody>
 
         <ModalFooter>

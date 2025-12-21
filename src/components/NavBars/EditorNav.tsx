@@ -31,7 +31,6 @@ import Nav from '../Layout/NavBar';
 import EditFlowModal from '../Modals/EditFlowModal';
 import ExportJsonModal from '../Modals/ExportJsonModal';
 import SaveFlowModal from '../Modals/SaveFlowModal';
-import SummarizerModal from '../Modals/SummarizerModal';
 type EditorNavProps = {
   saveFunc: () => Promise<void>;
 };
@@ -69,11 +68,6 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
     isOpen: isOpenSave,
     onOpen: onOpenSave,
     onClose: onCloseSave,
-  } = useDisclosure();
-  const {
-    isOpen: isOpenAITool,
-    onOpen: onOpenSummarizeTool,
-    onClose: onCloseAITool,
   } = useDisclosure();
 
   const toast = useToast();
@@ -281,12 +275,6 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
               },
             ]}
           />
-          <ActionButton
-            label="Summarizer tool"
-            disabled={false}
-            onClick={onOpenSummarizeTool}
-            icon={<ViewIcon color="blue.500" />}
-          />
           <Box color="gray.600">
             <strong>{publish ? 'Published' : 'Not published'} </strong>
             <IconButton
@@ -342,7 +330,6 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
             flow={flow}
             updateInfo={updateFlowInfo}
           />
-          <SummarizerModal isOpen={isOpenAITool} onClose={onCloseAITool} />
         </>
       )}
       <SaveFlowModal

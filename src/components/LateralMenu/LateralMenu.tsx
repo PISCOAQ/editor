@@ -15,9 +15,13 @@ interface NodeItem {
   text: string;
   icon: string;
   index: string;
-  group: string;
 }
 
+// We organized the menu by bloom taxonomy levels:
+// I leave as template the configuration if needed.
+// the concept is that each node has an assigned group so you can easily filter them here.
+
+/*
 const configLearning = [
   {
     label: 'REMEMBER',
@@ -40,6 +44,7 @@ const configLearning = [
     group: 'create_learning',
   },
 ];
+
 const configAssessment = [
   {
     label: 'REMEMBER',
@@ -62,254 +67,106 @@ const configAssessment = [
     group: 'create_assessment',
   },
 ];
+*/
+
+//In our case we had multiple nodes that weren't already implemented in execution phase, 
+//so we decided to show them but not allowing the usage, you can remove this list and the corresponding logic if not needed.
 
 const listImplementedNodes = [
-  'abstractNode',
   'multipleChoiceQuestionNode',
   'closeEndedQuestionNode',
   'OpenQuestionNode',
   'TrueFalseNode',
   'ReadMaterialNode',
   'WatchVideoNode',
-  'SummaryNode',
-  'ScanningNode',
-  'codingQuestionNode',
   'CollaborativeModelingNode',
   'UMLModelingNode',
   'CircuitNode',
 ];
+
+//lateral menu configuration with bloom taxonomy concept as example of configured menu.
+
 export type LateralMenuProps = {
   isOpen: boolean;
 };
+const ITEM_COLORS = ['#FFCC49', '#FFF0C8'];
+
 const LateralMenu = ({ isOpen }: LateralMenuProps) => {
   if (!isOpen) return <></>;
-  const onDragStart = (event: DragEvent<HTMLDivElement>, nodeType: string) => {
-    if (event.dataTransfer == null) {
-      return;
-    }
+
+  const onDragStart = (
+    event: DragEvent<HTMLDivElement>,
+    nodeType: string
+  ) => {
+    if (!event.dataTransfer) return;
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
+
   const nodes: NodeItem[] = Object.keys(
     polyglotNodeComponentMapping.nameMapping
-  ).map((index, id) => {
-    return {
-      key: id.toString(),
-      text: polyglotNodeComponentMapping.nameMapping[index],
-      icon: polyglotNodeComponentMapping.iconMapping[index] ?? '',
-      index: index,
-      group: polyglotNodeComponentMapping.groupMapping[index] ?? '',
-    };
-  });
-
-  console.log(nodes)
+  ).map((index, id) => ({
+    key: id.toString(),
+    text: polyglotNodeComponentMapping.nameMapping[index],
+    icon: polyglotNodeComponentMapping.iconMapping[index] ?? '',
+    index,
+  }));
 
   return (
-    <>
-      <Box
-        w={'300px'}
-        title="drag the new node"
-        marginBottom={'0px'}
-        backgroundColor={'rgba(217, 217, 217, 0.6)'}
-      >
-        <div className="label">NEW ACTIVITY</div>
+    <Box
+      w="300px"
+      backgroundColor="rgba(217, 217, 217, 0.6)"
+    >
+      <div className="label">NEW ACTIVITY</div>
 
-        <Box height="100%" overflowY="scroll" paddingBottom={'15%'}>
-          <div
-            className="nodeSubmenu"
-            style={{
-              backgroundColor: 'rgba(255, 204, 73, 1)',
-            }}
-          >
-            LEARNING ACTIVITY
-          </div>
-          <Accordion defaultIndex={0} variant={{}}>
-            {configLearning.map((type, id) => (
-              <AccordionItem key={id}>
-                {({ isExpanded }) => (
-                  <>
-                    <AccordionButton
-                      backgroundColor={type.bgColor}
-                      padding={{ base: '5px', md: '8px', xl: '10px' }}
-                      fontFamily={'Inter'}
-                      fontSize={{ base: '10px', md: '12px', xl: '14px' }}
-                      height={{ base: '15px', md: '22px', xl: '30px' }}
-                    >
-                      {isExpanded ? (
-                        <ChevronDownIcon
-                          fontSize={{ base: '15px', md: '18px', xl: '20px' }}
-                        />
-                      ) : (
-                        <ChevronRightIcon
-                          fontSize={{ base: '15px', md: '18px', xl: '20px' }}
-                        />
-                      )}{' '}
-                      {type.label}
-                    </AccordionButton>
+      <Box height="100%" overflowY="auto" paddingBottom="15%">
+        {nodes.map((node, idx) => {
+          const isEnabled =
+            listImplementedNodes.includes(node.index);
 
-                    <AccordionPanel key={id}>
-                      {nodes
-                        .filter((node) => node.group === type.group)
-                        .map((nodes) => (
-                          <>
-                            <Box
-                              id={nodes.key}
-                              key={nodes.key}
-                              className="nodeItem"
-                              fontSize={{
-                                base: '10px',
-                                md: '12px',
-                                xl: '14px',
-                              }}
-                              onMouseOver={() =>
-                                listImplementedNodes.includes(nodes.index)
-                                  ? document
-                                      .getElementById(nodes.key)
-                                      ?.setAttribute(
-                                        'style',
-                                        'background-color:' + type.bgColor
-                                      )
-                                  : document
-                                      .getElementById(nodes.key)
-                                      ?.setAttribute(
-                                        'style',
-                                        'background-color: grey'
-                                      )
-                              }
-                              onMouseOut={() =>
-                                document
-                                  .getElementById(nodes.key)
-                                  ?.removeAttribute('style')
-                              }
-                              onDragStart={(event) =>
-                                listImplementedNodes.includes(nodes.index)
-                                  ? onDragStart(event, nodes.index)
-                                  : null
-                              }
-                              draggable={
-                                listImplementedNodes.includes(nodes.index)
-                                  ? true
-                                  : false
-                              }
-                              title={
-                                listImplementedNodes.includes(nodes.index)
-                                  ? 'Drag the new Node type'
-                                  : 'Node type not implemented yet'
-                              }
-                            >
-                              <Image
-                                alt={'Node icon'}
-                                src={nodes.icon}
-                                style={{ float: 'left' }}
-                                height="20"
-                                width="20"
-                              />
-                              {nodes.text}
-                            </Box>
-                          </>
-                        ))}
-                    </AccordionPanel>
-                  </>
-                )}
-              </AccordionItem>
-            ))}
-          </Accordion>
-          <div
-            className="nodeSubmenu"
-            style={{
-              marginTop: '20px',
-              backgroundColor: 'rgba(124, 104, 146, 0.5)',
-            }}
-          >
-            ASSESSMENT ACTIVITY
-          </div>
-          <Accordion>
-            {configAssessment.map((type, id) => (
-              <AccordionItem key={id} sx={{ borderWidth: '0px' }}>
-                {({ isExpanded }) => (
-                  <>
-                    <AccordionButton
-                      backgroundColor={type.bgColor}
-                      padding={{ base: '5px', md: '8px', xl: '10px' }}
-                      fontFamily={'Inter'}
-                      fontSize={{ base: '10px', md: '12px', xl: '14px' }}
-                      height={{ base: '15px', md: '22px', xl: '30px' }}
-                    >
-                      {isExpanded ? (
-                        <ChevronDownIcon
-                          fontSize={{ base: '15px', md: '18px', xl: '20px' }}
-                        />
-                      ) : (
-                        <ChevronRightIcon
-                          fontSize={{ base: '15px', md: '18px', xl: '20px' }}
-                        />
-                      )}{' '}
-                      {type.label}
-                    </AccordionButton>
-                    <AccordionPanel>
-                      {nodes
-                        .filter((node) => node.group === type.group)
-                        .map((nodes) => (
-                          <Box
-                            id={nodes.key}
-                            key={nodes.key}
-                            className="nodeItem"
-                            fontSize={{ base: '10px', md: '12px', xl: '14px' }}
-                            onMouseOver={() =>
-                              listImplementedNodes.includes(nodes.index)
-                                ? document
-                                    .getElementById(nodes.key)
-                                    ?.setAttribute(
-                                      'style',
-                                      'background-color:' + type.bgColor
-                                    )
-                                : document
-                                    .getElementById(nodes.key)
-                                    ?.setAttribute(
-                                      'style',
-                                      'background-color: grey'
-                                    )
-                            }
-                            onMouseOut={() =>
-                              document
-                                .getElementById(nodes.key)
-                                ?.removeAttribute('style')
-                            }
-                            onDragStart={(event) =>
-                              listImplementedNodes.includes(nodes.index)
-                                ? onDragStart(event, nodes.index)
-                                : null
-                            }
-                            draggable={
-                              listImplementedNodes.includes(nodes.index)
-                                ? true
-                                : false
-                            }
-                            title={
-                              listImplementedNodes.includes(nodes.index)
-                                ? 'Drag the new Node type'
-                                : 'Node type not implemented yet'
-                            }
-                          >
-                            <Image
-                              alt={'Node icon'}
-                              src={nodes.icon}
-                              style={{ float: 'left' }}
-                              height="20"
-                              width="20"
-                            />
-                            {nodes.text}
-                          </Box>
-                        ))}
-                    </AccordionPanel>
-                  </>
-                )}
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </Box>
+          const bgColor =
+            ITEM_COLORS[idx % ITEM_COLORS.length];
+
+          return (
+            <Box
+              key={node.key}
+              id={node.key}
+              display="flex"
+              alignItems="center"
+              gap="8px"
+              padding="8px"
+              marginBottom="4px"
+              backgroundColor={bgColor}
+              cursor={isEnabled ? 'grab' : 'not-allowed'}
+              opacity={isEnabled ? 1 : 0.5}
+              fontSize={{ base: '10px', md: '12px', xl: '14px' }}
+              draggable={isEnabled}
+              title={
+                isEnabled
+                  ? 'Drag the new Node type'
+                  : 'Node type not implemented yet'
+              }
+              onDragStart={(event) =>
+                isEnabled
+                  ? onDragStart(event, node.index)
+                  : null
+              }
+              _hover={{
+                backgroundColor: isEnabled ? '#e6b83f' : bgColor,
+              }}
+            >
+              <Image
+                alt="Node icon"
+                src={node.icon}
+                width={20}
+                height={20}
+              />
+              {node.text}
+            </Box>
+          );
+        })}
       </Box>
-    </>
+    </Box>
   );
 };
 

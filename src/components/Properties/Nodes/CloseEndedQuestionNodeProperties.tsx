@@ -2,7 +2,6 @@ import { Button, SkeletonText, useDisclosure } from '@chakra-ui/react';
 import { useState } from 'react';
 import ArrayField from '../../Forms/Fields/ArrayField';
 import MarkDownField from '../../Forms/Fields/MarkDownField';
-import AIToolModal from '../../Modals/AIToolModal';
 import NodeProperties from './NodeProperties';
 
 const CloseEndedQuestionNodeProperties = () => {
@@ -18,12 +17,6 @@ const CloseEndedQuestionNodeProperties = () => {
         platform={['WebApp']}
         activityDescription="In this activity learners will have to complete a sentence with the
         appropriate word or phrase"
-      />
-      <AIToolModal
-        isOpen={isOpenAITool}
-        onClose={onCloseAITool}
-        exType={'closeEndedQuestionNode'}
-        action={setGeneratingLoading}
       />
       <Button
         marginBottom={'5px'}

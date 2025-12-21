@@ -1,7 +1,6 @@
 import { Button, SkeletonText, useDisclosure } from '@chakra-ui/react';
 import { useState } from 'react';
 import MarkDownField from '../../Forms/Fields/MarkDownField';
-import AIToolModal from '../../Modals/AIToolModal';
 import NodeProperties from './NodeProperties';
 
 const OpenQuestionNodeProperties = () => {
@@ -17,12 +16,7 @@ const OpenQuestionNodeProperties = () => {
         platform={['WebApp']}
         activityDescription="In this activity learners will answer to an Open Question"
       />
-      <AIToolModal
-        isOpen={isOpenAITool}
-        onClose={onCloseAITool}
-        exType={'OpenQuestionNode'}
-        action={setGeneratingLoading}
-      />
+      
       <Button
         marginBottom={'5px'}
         id="buttonAI"
