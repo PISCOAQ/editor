@@ -6,5 +6,4 @@ export * from './Node';
 export * from './OpenQuestionNode';
 export * from './ReadMaterialNode';
 export * from './TrueFalseNode';
-export * from './UMLModelingNode';
 export * from './WatchVideoNode';

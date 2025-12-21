@@ -11,27 +11,9 @@ import {
   polyglotNodeComponentMapping,
   ProgressInfo,
 } from '../types/polyglotElements';
-import {
-  AIExerciseType,
-  AIPlanLesson,
-  AnalyseType,
-  MaterialType,
-  SummerizerBody,
-} from '../types/polyglotElements/AIGenerativeTypes/AIGenerativeTypes';
-import { ConceptMap } from '../types/polyglotElements/concept/Conceptmap';
-import {
-  PapyAssignmentAPI,
-  PapyProject,
-} from '../types/polyglotElements/PapyrusTypes/PapyrusTypes';
 import { User } from '../types/user';
 import { createNewDefaultPolyglotFlow } from '../utils/utils';
 import exampleFlows from './exampleData';
-
-export type aiAPIResponse = {
-  Date: string;
-  Question: string;
-  CorrectAnswer: string;
-};
 
 const axios = axiosCreate.create({
   baseURL: process.env.BACK_URL,
@@ -49,12 +31,6 @@ const axiosProgress = axiosCreate.create({
   },
 });
 
-const axiosPapyGame = axiosCreate.create({
-  baseURL: 'https://papygame.tech/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 type AutocompleteOutput = string[];
 
@@ -167,15 +143,6 @@ export class APIV2 {
   }
   createNewFlowJson(flow: PolyglotFlow): Promise<AxiosResponse> {
     return this.axios.post<{}, AxiosResponse, {}>(`/api/flows/json`, flow);
-  }
-  getConceptGraph(
-    topic: string,
-    depth: number
-  ): Promise<AxiosResponse<ConceptMap>> {
-    return this.axios.post('/api/openai/genGraph', {
-      topic: topic,
-      depth: depth,
-    });
   }
 
   loadCourses(query?: string): Promise<AxiosResponse<PolyglotCourse[]>> {
@@ -306,47 +273,4 @@ export const API = {
     );
   },
 
-  analyseMaterial: (body: AnalyseType): Promise<AxiosResponse> => {
-    return axios.post<{}, AxiosResponse, {}>(
-      `/api/openai/MaterialAnalyser`,
-      body
-    );
-  },
-
-  generateMaterial: (body: MaterialType): Promise<AxiosResponse> => {
-    return axios.post<{}, AxiosResponse, {}>(
-      `/api/openai/MaterialGenerator`,
-      body
-    );
-  },
-
-  summarize: (body: SummerizerBody): Promise<AxiosResponse> => {
-    return axios.post<{}, AxiosResponse, {}>(`/api/openai/Summarizer`, body);
-  },
-
-  generateNewExercise: (body: AIExerciseType): Promise<AxiosResponse> => {
-    return axios.post<{}, AxiosResponse, {}>(
-      `/api/openai/ActivityGenerator`,
-      body
-    );
-  },
-
-  planLesson: (body: AIPlanLesson): Promise<AxiosResponse> => {
-    return axios.post<{}, AxiosResponse, {}>(`/api/openai/PlanLesson`, body);
-  },
-
-  getAssignmentProjects: (): Promise<AxiosResponse> => {
-    return axiosPapyGame.get<{}, AxiosResponse, {}>(`/assignmentProjects`);
-  },
-
-  generateNewProject: (body: PapyProject): Promise<AxiosResponse> => {
-    return axiosPapyGame.post<{}, AxiosResponse, {}>(
-      `/newAssignmentProject`,
-      body
-    );
-  },
-
-  generateNewAssignment: (body: PapyAssignmentAPI): Promise<AxiosResponse> => {
-    return axiosPapyGame.post<{}, AxiosResponse, {}>(`/newAssignment`, body);
-  },
 };
