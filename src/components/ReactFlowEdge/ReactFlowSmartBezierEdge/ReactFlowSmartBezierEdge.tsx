@@ -14,7 +14,6 @@ const ReactFlowSmartBezierEdge = (props: ReactFlowSmartBezierEdgeProps) => {
     sourceY,
     targetX,
     targetY,
-    markerStart,
     markerEnd,
   } = props;
 
@@ -30,13 +29,14 @@ const ReactFlowSmartBezierEdge = (props: ReactFlowSmartBezierEdgeProps) => {
     nodes,
   });
 
-  // If the value returned is null, it means "getSmartEdge" was unable to find
-  // a valid path, and you should do something else instead
   if (getSmartEdgeResponse === null) {
     return <BezierEdge {...props} />;
   }
 
   const { edgeCenterX, edgeCenterY, svgPathString } = getSmartEdgeResponse;
+
+  const strokeColor =
+    (props.style as any)?.stroke || (markerEnd as any)?.color || 'black';
 
   return (
     <>
@@ -52,6 +52,7 @@ const ReactFlowSmartBezierEdge = (props: ReactFlowSmartBezierEdgeProps) => {
         className="react-flow__edge-path"
         d={svgPathString}
         markerEnd={markerEnd}
+        style={{ stroke: strokeColor }}
       />
       <EdgeLabelRenderer>
         <div

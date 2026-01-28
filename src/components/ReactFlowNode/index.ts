@@ -1,8 +1,13 @@
 export { default as ReactFlowCircuitNode } from './ReactFlowCircuitNode/ReactFlowCircuitNode';
 export { default as ReactFlowCloseEndedQuestionNode } from './ReactFlowCloseEndedQuestionNode/ReactFlowCloseEndedQuestionNode';
+export { default as ReactFlowEmotionAttributionTestNode } from './ReactFlowEmotionAttributionTestNode/ReactFlowEmotionAttributionTestNode';
+export { default as ReactFlowEyesTaskTest } from './ReactFlowEyesTaskTestNode/ReactFlowEyesTaskTestNode';
+export { default as ReactFlowFauxPasNode } from './ReactFlowFauxPasNode/ReactFlowFauxPasNode';
 export { default as ReactFlowLessonNode } from './ReactFlowLessonNode/ReactFlowLessonNode';
 export { default as ReactFlowMultipleChoiceQuestionNode } from './ReactFlowMultipleChoiceQuestionNode/ReactFlowMultipleChoiceQuestionNode';
 export { default as ReactFlowOpenQuestionNode } from './ReactFlowOpenQuestionNode/ReactFlowOpenQuestionNode';
 export { default as ReactFlowReadMaterialNode } from './ReactFlowReadMaterialNode/ReactFlowReadMaterialNode';
+export { default as ReactFlowSocialSituationsNode } from './ReactFlowSocialSituationsNode/ReactFlowSocialSituationsNode';
+export { default as ReactFlowTeoriaDellaMenteNode } from './ReactFlowTeoriaDellaMenteNode/ReactFlowTeoriaDellaMenteNode';
 export { default as ReactFlowTrueFalseNode } from './ReactFlowTrueFalseNode/ReactFlowTrueFalseNode';
 export { default as ReactFlowWatchVideoNode } from './ReactFlowWatchVideoNode/ReactFlowWatchVideoNode';

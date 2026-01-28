@@ -35,6 +35,8 @@ import ContextMenu, {
   ContextMenuTypes,
 } from '../ContextMenu/ContextMenu';
 
+import { useToast } from '@chakra-ui/react';
+import { useEffect } from 'react';
 import { createNewDefaultPolyglotNode } from '../../utils/utils';
 import LateralMenu from '../LateralMenu/LateralMenu';
 import EditorNav from '../NavBars/EditorNav';
@@ -253,10 +255,33 @@ const FlowEditor = ({ saveFlow, onSelectionChange }: FlowEditorProps) => {
     }
   }
 
+  const ToastBridge = () => {
+    const toast = useToast();
+    const uiToast = useStore((s: any) => s.uiToast);
+    const clearUIToast = useStore((s: any) => s.clearUIToast);
+
+    useEffect(() => {
+      if (!uiToast) return;
+
+      toast({
+        title: uiToast.title,
+        description: uiToast.description,
+        status: uiToast.status,
+        duration: uiToast.duration ?? 3500,
+        isClosable: true,
+      });
+
+      clearUIToast();
+    }, [uiToast, toast, clearUIToast]);
+
+    return null;
+  };
+
   return (
     <Flex direction={'column'} h="100vh" fontFamily={'Roboto'}>
       <EditorNav saveFunc={saveFlow} />
       <Flex h={'full'} overflow="hidden">
+        <ToastBridge />
         <ReactFlow
           // nodes setup
           nodes={getNodes()}

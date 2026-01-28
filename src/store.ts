@@ -40,6 +40,13 @@ export type SelectedElement = {
   id: string;
 };
 
+export type UIToast = {
+  title: string;
+  description?: string;
+  status: 'info' | 'warning' | 'success' | 'error';
+  duration?: number;
+};
+
 interface ApplicationState {
   published: any;
   currentAction: number;
@@ -69,6 +76,10 @@ interface ApplicationState {
   selectedElement: Nullable<SelectedElement>;
   selectedNode: Nullable<string>;
   selectedEdge: Nullable<string>;
+
+  uiToast: UIToast | null;
+  clearUIToast: () => void;
+
   getSelectedElement: () => PolyglotEdge | PolyglotNode | undefined;
   getSelectedNode: () => Nullable<PolyglotNode>;
   getSelectedEdge: () => Nullable<PolyglotEdge>;
@@ -114,6 +125,16 @@ const useStore = create<ApplicationState>()(
             lastSavedAction: state.currentAction,
           }));
         },
+
+        uiToast: null,
+        clearUIToast: () => {
+          set((state) =>
+            produce(state, (draft) => {
+              draft.uiToast = null;
+            })
+          );
+        },
+
         addAction: (action) => {
           set((state) => {
             const tmp = [...state.actions];
@@ -624,23 +645,138 @@ const useStore = create<ApplicationState>()(
 
         onConnect: (connection, skipAction) => {
           let newEdge: any;
+
+          // helper locali (senza !=)
+          type Op = '>' | '>=' | '<' | '<=' | '==';
+
+          const getQuestionCountFromNode = (node: any): number | null => {
+            if (!node) return null;
+            const t = node.type;
+            const d = node.data;
+
+            if (t === 'EmotionAttributionTestNode')
+              return Array.isArray(d?.questions) ? d.questions.length : 0;
+            if (t === 'TeoriaDellaMenteNode')
+              return Array.isArray(d?.quiz) ? d.quiz.length : 0;
+            if (t === 'FauxPasNode')
+              return Array.isArray(d?.quiz) ? d.quiz.length : 0;
+            if (t === 'socialSituationsNode')
+              return Array.isArray(d?.items) ? d.items.length : 0;
+            if (t === 'EyesTaskTestNode')
+              return Array.isArray(d?.questions) ? d.questions.length : 0;
+
+            return null;
+          };
+
+          const clampInt = (n: any, Q: number) => {
+            const v = Math.floor(Number(n));
+            if (!Number.isFinite(v)) return 0;
+            return Math.max(0, Math.min(Q, v));
+          };
+
+          const toRange = (op: Op, th: number, Q: number): [number, number] => {
+            switch (op) {
+              case '==':
+                return [th, th];
+              case '>':
+                return [th + 1, Q];
+              case '>=':
+                return [th, Q];
+              case '<':
+                return [0, th - 1];
+              case '<=':
+                return [0, th];
+            }
+          };
+
+          const normalizeRange = (
+            r: [number, number],
+            Q: number
+          ): [number, number] => {
+            const a = Math.max(0, Math.min(Q, r[0]));
+            const b = Math.max(0, Math.min(Q, r[1]));
+            return a <= b ? [a, b] : [1, 0]; // range vuoto
+          };
+
+          const covers = (r: [number, number], k: number) =>
+            r[0] <= k && k <= r[1];
+
+          const findFreeK = (
+            ranges: [number, number][],
+            Q: number
+          ): number | null => {
+            for (let k = 0; k <= Q; k++) {
+              if (!ranges.some((r) => covers(r, k))) return k;
+            }
+            return null;
+          };
+
           set((state) =>
             produce(state, (draft) => {
               if (!connection.source || !connection.target) {
                 console.log('Source or target undefined!');
                 return;
               }
+
               const sourceNode = draft.nodeMap.get(connection.source)!;
 
+              // creo edge “standard”
               newEdge = createNewDefaultPolyglotEdge(
                 connection.source,
-                sourceNode.type, //to be changed into group type (learning/assessment)
+                sourceNode.type,
                 connection.target
               );
+
+              //  BLOCCO/DEFAULT DISGIUNTO solo per conditionalEdge
+              if (newEdge.type === 'conditionalEdge') {
+                const Q = getQuestionCountFromNode(sourceNode);
+
+                // Se non conosco Q, non posso garantire disgiunzione: scelgo di NON bloccare.
+                // (Se vuoi essere più rigido: blocca e chiedi di configurare domande.)
+                if (typeof Q === 'number' && Number.isFinite(Q)) {
+                  const outgoingConditionals = Array.from(
+                    draft.edgeMap.values()
+                  ).filter(
+                    (e: any) =>
+                      e?.type === 'conditionalEdge' &&
+                      e?.reactFlow?.source === connection.source
+                  );
+
+                  const usedRanges: [number, number][] =
+                    outgoingConditionals.map((e: any) => {
+                      const op = (e.data?.operator ?? '>=') as Op;
+                      const th = clampInt(e.data?.threshold ?? 0, Q);
+                      return normalizeRange(toRange(op, th, Q), Q);
+                    });
+
+                  const k = findFreeK(usedRanges, Q);
+
+                  if (k === null) {
+                    draft.uiToast = {
+                      title: 'Connessione non valida',
+                      description: `Non puoi creare un nuovo edge condizionale: tutte le possibilità sono già coperte.`,
+                      status: 'warning',
+                      duration: 3500,
+                    };
+                    newEdge = undefined;
+                    return; // non aggiungo l’edge
+                  }
+
+                  //  Default disgiunto per costruzione: == k
+                  newEdge.data = {
+                    ...(newEdge.data ?? {}),
+                    operator: '==',
+                    threshold: k,
+                  };
+                }
+              }
+
+              if (!newEdge) return;
               draft.edgeMap.set(newEdge.reactFlow.id, newEdge);
             })
           );
-          if (!skipAction) {
+
+          if (!skipAction && newEdge) {
             const state = get();
             state.addAction({
               type: 'create',

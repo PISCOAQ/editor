@@ -110,16 +110,49 @@ const configUnconditionalEdge = [
   'CodingQuestionNode',
 ];
 
+const configConditionalDefaultTrueEdge = [
+  'EmotionAttributionTestNode',
+  'EyesTaskTestNode',
+  'socialSituationsNode',
+  'TeoriaDellaMenteNode',
+  'FauxPasNode',
+];
+
 export const createNewDefaultPolyglotEdge = (
   sourceId: string,
   sourceType: string,
   targetId: string
 ): PolyglotEdge => {
   const id = UUIDv4();
+
+  // 3 casi: unconditional / conditional / passFail
   const type = configUnconditionalEdge.includes(sourceType || '')
     ? 'unconditionalEdge'
-    : 'passFailEdge'; //to change into group type (learning)
-  console.log(type);
+    : configConditionalDefaultTrueEdge.includes(sourceType || '')
+    ? 'conditionalEdge'
+    : 'passFailEdge';
+
+  const markerColor =
+    type === 'unconditionalEdge'
+      ? 'grey'
+      : type === 'conditionalEdge'
+      ? 'blue'
+      : 'green';
+
+  const style =
+    type === 'unconditionalEdge'
+      ? 'grey'
+      : type === 'conditionalEdge'
+      ? 'blue'
+      : 'green';
+
+  const data =
+    type === 'passFailEdge'
+      ? { conditionKind: 'pass' }
+      : type === 'conditionalEdge'
+      ? { operator: '>=', threshold: 0 }
+      : {};
+
   return {
     _id: id,
     reactFlow: {
@@ -127,8 +160,9 @@ export const createNewDefaultPolyglotEdge = (
       source: sourceId,
       target: targetId,
       type: type,
+      style: { stroke: style },
       markerEnd: {
-        color: type == 'unconditionalEdge' ? 'grey' : 'green',
+        color: markerColor,
         type: MarkerType.Arrow,
         width: 25,
         height: 25,
@@ -136,12 +170,7 @@ export const createNewDefaultPolyglotEdge = (
     },
     type: type,
     title: '',
-    code: `
-    async Task<(bool, string)> validate(PolyglotValidationContext context) {
-        return (String.Equals(context.Condition.Data.value, context.JourneyContext.SubmittedCode), "Exact value edge");
-    }`,
-    data: {
-      conditionKind: 'pass',
-    },
+    code: '',
+    data,
   };
 };

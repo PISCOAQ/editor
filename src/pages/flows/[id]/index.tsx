@@ -135,10 +135,15 @@ const FlowIndex = ({ accessToken }: FlowIndexProps) => {
         ) {
           // if the flow stored has a different uuid i stored as a rescue
           if (store_flow.activeFlowInfo._id !== flowId) {
-            localStorage.setItem(
-              'rescue-' + store_flow.activeFlowInfo._id,
-              flow_serialize
-            );
+            try {
+              localStorage.setItem(
+                'rescue-' + store_flow.activeFlowInfo._id,
+                flow_serialize
+              );
+            } catch (e) {
+              console.warn('Rescue non salvato: localStorage pieno', e);
+            }
+
             useStore.persist.clearStorage();
           } else {
             setLoading(false);

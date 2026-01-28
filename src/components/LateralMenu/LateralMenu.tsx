@@ -14,82 +14,35 @@ interface NodeItem {
   key: string;
   text: string;
   icon: string;
-  index: string;
+  index: string; // nodeType
 }
-
-// We organized the menu by bloom taxonomy levels:
-// I leave as template the configuration if needed.
-// the concept is that each node has an assigned group so you can easily filter them here.
-
-/*
-const configLearning = [
-  {
-    label: 'REMEMBER',
-    bgColor: '#FFF0C8',
-    group: 'remember_learning',
-  },
-  {
-    label: 'UNDERSTAND',
-    bgColor: '#FFEBB6',
-    group: 'understand_learning',
-  },
-  {
-    label: 'APPLY',
-    bgColor: '#FFE092',
-    group: 'apply_learning',
-  },
-  {
-    label: 'CREATE',
-    bgColor: '#FFCC49',
-    group: 'create_learning',
-  },
-];
-
-const configAssessment = [
-  {
-    label: 'REMEMBER',
-    bgColor: '#D3CDDB',
-    group: 'remember_assessment',
-  },
-  {
-    label: 'UNDERSTAND',
-    bgColor: '#BEB4C9',
-    group: 'understand_assessment',
-  },
-  {
-    label: 'APPLY',
-    bgColor: '#9282A5',
-    group: 'apply_assessment',
-  },
-  {
-    label: 'CREATE',
-    bgColor: '#7C6892',
-    group: 'create_assessment',
-  },
-];
-*/
-
-//In our case we had multiple nodes that weren't already implemented in execution phase,
-//so we decided to show them but not allowing the usage, you can remove this list and the corresponding logic if not needed.
-
-const listImplementedNodes = [
-  'multipleChoiceQuestionNode',
-  'closeEndedQuestionNode',
-  'OpenQuestionNode',
-  'TrueFalseNode',
-  'ReadMaterialNode',
-  'WatchVideoNode',
-  'CollaborativeModelingNode',
-  'UMLModelingNode',
-  'CircuitNode',
-];
-
-//lateral menu configuration with bloom taxonomy concept as example of configured menu.
 
 export type LateralMenuProps = {
   isOpen: boolean;
 };
+
 const ITEM_COLORS = ['#FFCC49', '#FFF0C8'];
+
+/** Sezioni richieste + nodi visibili */
+const MENU_SECTIONS: Array<{
+  label: string;
+  nodes: string[];
+}> = [
+  {
+    label: 'Test',
+    nodes: [
+      'EmotionAttributionTestNode',
+      'EyesTaskTestNode',
+      'socialSituationsNode',
+      'TeoriaDellaMenteNode',
+      'FauxPasNode',
+    ],
+  },
+  {
+    label: 'Esercitazioni',
+    nodes: ['TrueFalseNode'],
+  },
+];
 
 const LateralMenu = ({ isOpen }: LateralMenuProps) => {
   if (!isOpen) return <></>;
@@ -100,7 +53,8 @@ const LateralMenu = ({ isOpen }: LateralMenuProps) => {
     event.dataTransfer.effectAllowed = 'move';
   };
 
-  const nodes: NodeItem[] = Object.keys(
+  // Tutti i nodi definiti nel mapping
+  const allNodes: NodeItem[] = Object.keys(
     polyglotNodeComponentMapping.nameMapping
   ).map((index, id) => ({
     key: id.toString(),
@@ -109,47 +63,87 @@ const LateralMenu = ({ isOpen }: LateralMenuProps) => {
     index,
   }));
 
+  // Helper: dato un array di nodeType, ritorna gli oggetti NodeItem (in quell’ordine)
+  const pickNodesInOrder = (types: string[]) =>
+    types
+      .map((t) => allNodes.find((n) => n.index === t))
+      .filter(Boolean) as NodeItem[];
+
   return (
     <Box w="300px" backgroundColor="rgba(217, 217, 217, 0.6)">
       <div className="label">NEW ACTIVITY</div>
 
       <Box height="100%" overflowY="auto" paddingBottom="15%">
-        {nodes.map((node, idx) => {
-          const isEnabled = listImplementedNodes.includes(node.index);
+        <Accordion allowMultiple defaultIndex={[0, 1]}>
+          {MENU_SECTIONS.map((section) => {
+            const sectionNodes = pickNodesInOrder(section.nodes);
 
-          const bgColor = ITEM_COLORS[idx % ITEM_COLORS.length];
+            // Se per qualche motivo nel mapping mancasse un nodo, la sezione rimane ma vuota.
+            return (
+              <AccordionItem key={section.label} border="none">
+                {({ isExpanded }) => (
+                  <>
+                    <AccordionButton
+                      padding="10px 12px"
+                      _hover={{ backgroundColor: 'rgba(0,0,0,0.06)' }}
+                    >
+                      <Box flex="1" textAlign="left" fontWeight="600">
+                        {section.label}
+                      </Box>
+                      {isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+                    </AccordionButton>
 
-          return (
-            <Box
-              key={node.key}
-              id={node.key}
-              display="flex"
-              alignItems="center"
-              gap="8px"
-              padding="8px"
-              marginBottom="4px"
-              backgroundColor={bgColor}
-              cursor={isEnabled ? 'grab' : 'not-allowed'}
-              opacity={isEnabled ? 1 : 0.5}
-              fontSize={{ base: '10px', md: '12px', xl: '14px' }}
-              draggable={isEnabled}
-              title={
-                isEnabled
-                  ? 'Drag the new Node type'
-                  : 'Node type not implemented yet'
-              }
-              onDragStart={(event) =>
-                isEnabled ? onDragStart(event, node.index) : null
-              }
-              _hover={{
-                backgroundColor: isEnabled ? '#e6b83f' : bgColor,
-              }}
-            >
-              <Image alt="Node icon" src={node.icon} width={20} height={20} />
-              {node.text}
-            </Box>
-          );
-        })}
+                    <AccordionPanel padding="6px 8px 10px 8px">
+                      {sectionNodes.map((node, idx) => {
+                        const bgColor = ITEM_COLORS[idx % ITEM_COLORS.length];
+
+                        return (
+                          <Box
+                            key={`${section.label}-${node.index}`}
+                            id={node.key}
+                            display="flex"
+                            alignItems="center"
+                            gap="8px"
+                            padding="8px"
+                            marginBottom="6px"
+                            backgroundColor={bgColor}
+                            cursor="grab"
+                            fontSize={{ base: '10px', md: '12px', xl: '14px' }}
+                            draggable
+                            title="Drag the new Node type"
+                            onDragStart={(event) =>
+                              onDragStart(event, node.index)
+                            }
+                            _hover={{ backgroundColor: '#e6b83f' }}
+                            borderRadius="6px"
+                          >
+                            <Image
+                              alt="Node icon"
+                              src={node.icon}
+                              width={20}
+                              height={20}
+                            />
+                            {node.text}
+                          </Box>
+                        );
+                      })}
+
+                      {sectionNodes.length === 0 ? (
+                        <Box
+                          padding="8px"
+                          fontSize={{ base: '10px', md: '12px' }}
+                          opacity={0.7}
+                        >
+                          Nessun nodo disponibile in questa sezione.
+                        </Box>
+                      ) : null}
+                    </AccordionPanel>
+                  </>
+                )}
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
       </Box>
     </Box>
   );

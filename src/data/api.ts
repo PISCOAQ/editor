@@ -31,7 +31,6 @@ const axiosProgress = axiosCreate.create({
   },
 });
 
-
 type AutocompleteOutput = string[];
 
 export class APIV2 {
@@ -273,4 +272,25 @@ export const API = {
     );
   },
 
+  uploadQuestionImage: (body: {
+    nodeId: string;
+    qid: string;
+    file: FormData;
+  }): Promise<AxiosResponse> => {
+    return axiosProgress.post(
+      `/api/file/upload/${body.nodeId}/questions/${body.qid}`,
+      body.file,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+  },
+
+  downloadQuestionImage: (body: {
+    nodeId: string;
+    qid: string;
+  }): Promise<AxiosResponse> => {
+    return axiosProgress.get(
+      `/api/file/download/${body.nodeId}/questions/${body.qid}`,
+      { responseType: 'blob' }
+    );
+  },
 };
