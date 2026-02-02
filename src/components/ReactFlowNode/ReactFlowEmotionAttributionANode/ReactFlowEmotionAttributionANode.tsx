@@ -5,9 +5,12 @@ import { EmotionAttributionANode } from '../../../types/polyglotElements';
 import Card from '../../Card/Card';
 import { ReactFlowNodeProps } from '../ReactFlowNode';
 
-type ReactFlowEmotionAttributionANodeProps = ReactFlowNodeProps & EmotionAttributionANode;
+type ReactFlowEmotionAttributionANodeProps = ReactFlowNodeProps &
+  EmotionAttributionANode;
 
-const ReactFlowEmotionAttributionANode = ({ id }: ReactFlowEmotionAttributionANodeProps) => {
+const ReactFlowEmotionAttributionANode = ({
+  id,
+}: ReactFlowEmotionAttributionANodeProps) => {
   const [onConnect, label] = useStore((state) => [
     state.onConnect,
     state.nodeMap.get(id)?.title,

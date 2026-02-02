@@ -1,5 +1,8 @@
 export * from './CircuitNode';
 export * from './CloseEndedQuestionNode';
+export * from './ContainerNode';
+export * from './EmotionAttributionANode';
+export * from './EmotionAttributionBNode';
 export * from './EmotionAttributionTestNode';
 export * from './EyesTaskTestNode';
 export * from './FauxPasNode';
@@ -12,6 +15,3 @@ export * from './SocialSituationsNode';
 export * from './TeoriaDellaMenteNode';
 export * from './TrueFalseNode';
 export * from './WatchVideoNode';
-export * from './EmotionAttributionANode';
-export * from './ContainerNode';
-export * from './EmotionAttributionBNode';

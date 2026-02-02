@@ -12,9 +12,9 @@ const EmotionAttributionANodeProperties = () => {
 
       <Box px={2} pt={2}>
         <Text fontSize="sm" color="gray.600">
-          Suggerimento: usa <b>Scenario</b> per descrivere la situazione e <b>Domanda</b>{' '}
-          per chiedere quale emozione/interpretazione è corretta. Inserisci poi una o più{' '}
-          <b>risposte corrette</b>.
+          Suggerimento: usa <b>Scenario</b> per descrivere la situazione e{' '}
+          <b>Domanda</b> per chiedere quale emozione/interpretazione è corretta.
+          Inserisci poi una o più <b>risposte corrette</b>.
         </Text>
       </Box>
 
@@ -27,5 +27,3 @@ const EmotionAttributionANodeProperties = () => {
 };
 
 export default EmotionAttributionANodeProperties;
-
-

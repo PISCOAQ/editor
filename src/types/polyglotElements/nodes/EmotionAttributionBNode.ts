@@ -43,4 +43,3 @@ polyglotNodeComponentMapping.registerMapping<EmotionAttributionBNode>({
     ],
   },
 });
-

@@ -127,6 +127,7 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
 
   const checkPublish = (): boolean => {
     if (flow == null) return false;
+
     if (!flow.nodes) {
       toast({
         title: 'Flow not published',
@@ -145,33 +146,74 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
     if (flow.duration === '') missingData += 'duration; ';
     if (flow.learningContext === '') missingData += 'learning context; ';
 
+    // helper: riusa la tua logica esistente
+    const validateNodeData = (type: string, data: any): boolean => {
+      if (!data) return false;
+
+      for (const key in data) {
+        if (allowedEmptyFields.includes(key)) continue;
+
+        // Nel ContainerNode "sections" è un array: non ha senso validarlo con isValidField
+        // (che di solito controlla stringhe/valori semplici).
+        if (type === 'ContainerNode' && key === 'sections') continue;
+
+        if (!isValidField(data[key])) return false;
+      }
+
+      if (typeSpecificChecks[type] && !typeSpecificChecks[type](data))
+        return false;
+
+      return true;
+    };
+
     let startingNode = 0;
 
     for (const node of flow.nodes) {
       let infoCheck = true;
+
+      // description del nodo (metadato) — invariato
       if (!node.description) infoCheck = false;
 
+      // valida il node.data
       const data = node.data;
-      for (const key in data) {
-        if (allowedEmptyFields.includes(key)) continue;
-        if (!isValidField(data[key])) {
-          infoCheck = false;
-          break;
-        }
-      }
-      if (
-        typeSpecificChecks[node.type] &&
-        !typeSpecificChecks[node.type](data)
-      ) {
-        infoCheck = false;
-      }
+      if (!validateNodeData(node.type, data)) infoCheck = false;
 
+      // se fallisce -> aggiungi titolo e continua
       if (!infoCheck) {
         missingData += node.title + '; ';
         continue;
       }
 
-      // Check if node has at least one incoming edge
+      // Se è ContainerNode: valida anche i figli embedded
+      if (node.type === 'ContainerNode') {
+        const sections = node.data?.sections ?? [];
+        for (let s = 0; s < sections.length; s++) {
+          const items = sections[s]?.items ?? [];
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const itemType = item?.type;
+            const itemData = item?.data;
+
+            // Se non abbiamo un type valido -> consideralo missing
+            if (!itemType) {
+              missingData += `${node.title} (section ${s + 1} item ${i + 1}); `;
+              continue;
+            }
+
+            // Valida i dati del figlio con i check del suo tipo
+            // NB: per i figli usiamo item.data (non node.data)
+            const okChild = validateNodeData(itemType, itemData);
+
+            if (!okChild) {
+              // messaggio più chiaro: titolo del figlio se c’è
+              const childLabel = item?.title || itemType;
+              missingData += `${childLabel}; `;
+            }
+          }
+        }
+      }
+
+      // Check if node has at least one incoming edge (solo per nodi del grafo)
       const hasIncomingEdge = flow.edges.some(
         (edge: { reactFlow: { target: any } }) =>
           edge.reactFlow.target === node._id

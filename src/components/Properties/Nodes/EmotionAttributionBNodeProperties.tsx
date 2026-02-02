@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
-import NodeProperties from './NodeProperties';
 import EmotionAttributionBEmbedded from '../../Embedded/EmotionAttributionBNodeEmbedded/EmotionAttributionBNodeEmbedded';
+import NodeProperties from './NodeProperties';
 /**
  * Properties panel per il nodo "EmotionAttributionBNode".
  *
@@ -25,4 +25,3 @@ const EmotionAttributionBNodeProperties = () => {
 };
 
 export default EmotionAttributionBNodeProperties;
-

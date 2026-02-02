@@ -1,8 +1,8 @@
 import type React from 'react';
+import ruotaIcona from '../../public/icona_ruota.png';
+import emotionIcon from '../../public/mult_choice_icon.png';
 import EmotionAttributionAEmbedded from './EmotionAttributionANodeEmbedded/EmotionAttributionANodeEmbedded';
 import EmotionAttributionBEmbedded from './EmotionAttributionBNodeEmbedded/EmotionAttributionBNodeEmbedded';
-import emotionIcon from '../../public/mult_choice_icon.png';
-import ruotaIcona from '../../public/icona_ruota.png';
 
 export type EmbeddedProps = {
   basePath: string;

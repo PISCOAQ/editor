@@ -108,6 +108,7 @@ const configUnconditionalEdge = [
   'PromptEngineeringNode',
   'ProblemSolvingNode',
   'CodingQuestionNode',
+  'ContainerNode',
 ];
 
 const configConditionalDefaultTrueEdge = [

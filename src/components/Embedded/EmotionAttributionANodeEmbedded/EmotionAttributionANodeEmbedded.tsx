@@ -1,6 +1,6 @@
 import { Divider, Heading } from '@chakra-ui/react';
-import TextField from '../../Forms/Fields/TextField';
 import StringArrayField from '../../Forms/Fields/StringArrayField';
+import TextField from '../../Forms/Fields/TextField';
 
 type Props = {
   /**

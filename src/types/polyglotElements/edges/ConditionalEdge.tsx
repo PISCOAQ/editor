@@ -28,10 +28,10 @@ polyglotEdgeComponentMapping.registerMapping<ConditionalEdge>({
   transformData: (edge) => {
     // Code sempre valido (anche se la consumer poi ignora e usa edge.data.*)
     const code = `
-async Task<(bool, string)> validate(PolyglotValidationContext context) {
-  return (true, "Conditional edge evaluated by consumer");
-}
-`;
+      async Task<(bool, string)> validate(PolyglotValidationContext context) {
+        return (true, "Conditional edge evaluated by consumer");
+      }
+    `;
     return { ...edge, code };
   },
 });

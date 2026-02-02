@@ -40,7 +40,11 @@ const MENU_SECTIONS: Array<{
   },
   {
     label: 'Esercitazioni',
-    nodes: ['TrueFalseNode'],
+    nodes: [
+      'ContainerNode',
+      'EmotionAttributionANode',
+      'EmotionAttributionBNode',
+    ],
   },
 ];
 

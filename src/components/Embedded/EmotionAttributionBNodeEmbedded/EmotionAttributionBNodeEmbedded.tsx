@@ -32,7 +32,8 @@ const EmotionAttributionBEmbedded = ({ basePath, isDisabled }: Props) => {
       </Heading>
 
       <Text fontSize="sm" color="gray.600" mb={3}>
-        Ogni elemento è composto da Emozione, Scenario e Spiegazione dello scenario.
+        Ogni elemento è composto da Emozione, Scenario e Spiegazione dello
+        scenario.
       </Text>
 
       <Button
@@ -58,13 +59,7 @@ const EmotionAttributionBEmbedded = ({ basePath, isDisabled }: Props) => {
         </Text>
       ) : (
         fields.map((field, index) => (
-          <Box
-            key={field.id}
-            borderWidth="1px"
-            borderRadius="md"
-            p={3}
-            mb={3}
-          >
+          <Box key={field.id} borderWidth="1px" borderRadius="md" p={3} mb={3}>
             <HStack justify="space-between" align="center" mb={2}>
               <Heading size="xs">Elemento {index + 1}</Heading>
               <Button
