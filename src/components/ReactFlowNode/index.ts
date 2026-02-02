@@ -11,3 +11,6 @@ export { default as ReactFlowSocialSituationsNode } from './ReactFlowSocialSitua
 export { default as ReactFlowTeoriaDellaMenteNode } from './ReactFlowTeoriaDellaMenteNode/ReactFlowTeoriaDellaMenteNode';
 export { default as ReactFlowTrueFalseNode } from './ReactFlowTrueFalseNode/ReactFlowTrueFalseNode';
 export { default as ReactFlowWatchVideoNode } from './ReactFlowWatchVideoNode/ReactFlowWatchVideoNode';
+export { default as ReactFlowEmotionAttributionANode } from './ReactFlowEmotionAttributionANode/ReactFlowEmotionAttributionANode';
+export { default as ReactFlowContainerNode } from './ReactFlowContainerNode/ReactFlowContainerNode';
+export { default as ReactFlowEmotionAttributionBNode } from './ReactFlowEmotionAttributionBNode/ReactFlowEmotionAttributionBNode';
