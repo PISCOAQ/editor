@@ -30,7 +30,7 @@ const QuestionImageUploadField = ({ nodeId, qid }: Props) => {
     };
   }, [previewUrl]);
 
-  // ✅ quando entri/rientri nel nodo: verifica se l'immagine esiste già per (nodeId, qid)
+  // quando entri/rientri nel nodo: verifica se l'immagine esiste già per (nodeId, qid)
   useEffect(() => {
     let cancelled = false;
 

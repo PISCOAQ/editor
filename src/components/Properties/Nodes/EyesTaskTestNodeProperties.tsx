@@ -7,13 +7,14 @@ import {
   IconButton,
   Stack,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 
+import { API } from '../../../data/api';
 import useStore from '../../../store';
 import QuestionImageUploadField from '../../Forms/Fields/QuestionImageUploadField';
 import SingleSelectAnswersField from '../../Forms/Fields/SingleSelectAnswersField';
-import TextField from '../../Forms/Fields/TextField';
 import NodeProperties from './NodeProperties';
 
 const newId = (prefix: string) =>
@@ -28,19 +29,18 @@ type EyesTaskQuestionForm = {
 
 const EyesTaskTestNodeProperties = () => {
   const { control } = useFormContext();
+  const toast = useToast();
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'data.questions',
   });
 
-  // watch UNA volta sola, fuori dal map
   const questions = useWatch({
     control,
     name: 'data.questions',
   }) as EyesTaskQuestionForm[] | undefined;
 
-  // nodo selezionato → serve per upload immagini
   const selectedElement = useStore((store: any) => {
     const v = store.getSelectedElement;
     return typeof v === 'function' ? v() : v;
@@ -83,18 +83,42 @@ const EyesTaskTestNodeProperties = () => {
       <Stack spacing={4}>
         {fields.map((field, index) => {
           const base = `data.questions.${index}`;
-          const qid = questions?.[index]?.qid; //  letto da watch globale
+          const qid = questions?.[index]?.qid;
 
           return (
             <Box key={field.id} borderWidth="1px" borderRadius="md" p={3}>
               <Flex justify="space-between" align="center" mb={2}>
                 <Heading size="xs">Quesito #{index + 1}</Heading>
+
                 <IconButton
                   aria-label="Rimuovi quesito"
                   size="xs"
                   colorScheme="red"
                   icon={<CloseIcon />}
-                  onClick={() => remove(index)}
+                  type="button"
+                  onClick={async () => {
+                    const qidToDelete = questions?.[index]?.qid;
+
+                    // se non ho le chiavi, rimuovo solo dal form
+                    if (!nodeId || !qidToDelete) {
+                      remove(index);
+                      return;
+                    }
+
+                    try {
+                      await API.deleteQuestionImage({
+                        nodeId,
+                        qid: qidToDelete,
+                      });
+
+                      // delete ok → rimuovo il quesito
+                      remove(index);
+                    } catch (e) {
+                      // in caso di errore NON rimuovo il quesito
+                      // (così non perdi il riferimento all'immagine)
+                      console.error('Delete question image failed', e);
+                    }
+                  }}
                 />
               </Flex>
 

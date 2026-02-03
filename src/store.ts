@@ -4,6 +4,7 @@ import { Connection, Edge, Node } from 'reactflow';
 import type { PartialDeep } from 'type-fest';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { API } from './data/api';
 import {
   PolyglotEdge,
   polyglotEdgeComponentMapping,
@@ -545,6 +546,14 @@ const useStore = create<ApplicationState>()(
           );
         },
         removeNode: (id, skipAction) => {
+          // Cleanup files lato server (idempotente)
+          // Lo facciamo solo sulle delete "utente" (non durante undo/redo)
+          if (!skipAction) {
+            void API.deleteAllNodeFiles({ nodeId: id }).catch((e) => {
+              console.error('deleteAllNodeFiles failed', { nodeId: id, e });
+            });
+          }
+
           if (!skipAction) {
             const state = get();
             state.addAction({
@@ -553,6 +562,7 @@ const useStore = create<ApplicationState>()(
               value: state.nodeMap.get(id),
             });
           }
+
           set((state) =>
             produce(state, (draft) => {
               draft.nodeMap.delete(id);

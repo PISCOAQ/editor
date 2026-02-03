@@ -293,4 +293,17 @@ export const API = {
       { responseType: 'blob' }
     );
   },
+
+  deleteQuestionImage: (body: {
+    nodeId: string;
+    qid: string;
+  }): Promise<AxiosResponse> => {
+    return axiosProgress.delete(
+      `/api/file/questions/${body.nodeId}/${body.qid}`
+    );
+  },
+
+  deleteAllNodeFiles: (body: { nodeId: string }): Promise<AxiosResponse> => {
+    return axiosProgress.delete(`/api/file/node/${body.nodeId}`);
+  },
 };
