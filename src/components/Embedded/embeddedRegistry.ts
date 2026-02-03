@@ -1,8 +1,11 @@
 import type React from 'react';
 import ruotaIcona from '../../public/icona_ruota.png';
 import emotionIcon from '../../public/mult_choice_icon.png';
+import socialIcon from '../../public/assessment_icon.png';
+
 import EmotionAttributionAEmbedded from './EmotionAttributionANodeEmbedded/EmotionAttributionANodeEmbedded';
 import EmotionAttributionBEmbedded from './EmotionAttributionBNodeEmbedded/EmotionAttributionBNodeEmbedded';
+import SocialSituationExerciseAEmbedded from './SocialSituationExerciseANodeEmbedded/SocialSituationExerciseANodeEmbedded';
 
 export type EmbeddedProps = {
   basePath: string;
@@ -44,6 +47,22 @@ export const embeddedRegistry: EmbeddedDefinition[] = [
           scenarioExplanation: '',
         },
       ],
+    }),
+  },
+  {
+    type: 'SocialSituationExerciseANode',
+    label: 'Situazione Sociale (A)',
+    icon: socialIcon.src,
+    component: SocialSituationExerciseAEmbedded,
+    createDefaultData: () => ({
+      scenario: '',
+      items: [
+        {
+          answer: '',
+          explanation: '',
+        },
+      ],
+      correctIndex: 0,
     }),
   },
 ];

@@ -34,7 +34,7 @@ const EyesTaskTestNodeProperties = () => {
     name: 'data.questions',
   });
 
-  // ✅ watch UNA volta sola, fuori dal map
+  // watch UNA volta sola, fuori dal map
   const questions = useWatch({
     control,
     name: 'data.questions',

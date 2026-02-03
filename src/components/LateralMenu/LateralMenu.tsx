@@ -44,6 +44,7 @@ const MENU_SECTIONS: Array<{
       'ContainerNode',
       'EmotionAttributionANode',
       'EmotionAttributionBNode',
+      'SocialSituationExerciseANode',
     ],
   },
 ];

@@ -15,3 +15,4 @@ export * from './SocialSituationsNode';
 export * from './TeoriaDellaMenteNode';
 export * from './TrueFalseNode';
 export * from './WatchVideoNode';
+export * from './SocialSituationExerciseANode';

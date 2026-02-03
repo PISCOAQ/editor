@@ -28,6 +28,7 @@ export type ContainerNode = PolyglotNode & {
 export const CONTAINER_NODE_ALLOWED_TYPES = [
   'EmotionAttributionANode',
   'EmotionAttributionBNode',
+  'SocialSituationExerciseANode',
 ] as const;
 
 polyglotNodeComponentMapping.registerMapping<ContainerNode>({

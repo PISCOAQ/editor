@@ -14,3 +14,4 @@ export { default as ReactFlowSocialSituationsNode } from './ReactFlowSocialSitua
 export { default as ReactFlowTeoriaDellaMenteNode } from './ReactFlowTeoriaDellaMenteNode/ReactFlowTeoriaDellaMenteNode';
 export { default as ReactFlowTrueFalseNode } from './ReactFlowTrueFalseNode/ReactFlowTrueFalseNode';
 export { default as ReactFlowWatchVideoNode } from './ReactFlowWatchVideoNode/ReactFlowWatchVideoNode';
+export { default as ReactFlowSocialSituationExerciseANode } from './ReactFlowSocialSituationExerciseANode/ReactFlowSocialSituationExerciseANode';
