@@ -1,7 +1,7 @@
 import type React from 'react';
+import socialIcon from '../../public/assessment_icon.png';
 import ruotaIcona from '../../public/icona_ruota.png';
 import emotionIcon from '../../public/mult_choice_icon.png';
-import socialIcon from '../../public/assessment_icon.png';
 
 import EmotionAttributionAEmbedded from './EmotionAttributionANodeEmbedded/EmotionAttributionANodeEmbedded';
 import EmotionAttributionBEmbedded from './EmotionAttributionBNodeEmbedded/EmotionAttributionBNodeEmbedded';

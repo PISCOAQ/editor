@@ -10,8 +10,8 @@ export { default as ReactFlowLessonNode } from './ReactFlowLessonNode/ReactFlowL
 export { default as ReactFlowMultipleChoiceQuestionNode } from './ReactFlowMultipleChoiceQuestionNode/ReactFlowMultipleChoiceQuestionNode';
 export { default as ReactFlowOpenQuestionNode } from './ReactFlowOpenQuestionNode/ReactFlowOpenQuestionNode';
 export { default as ReactFlowReadMaterialNode } from './ReactFlowReadMaterialNode/ReactFlowReadMaterialNode';
+export { default as ReactFlowSocialSituationExerciseANode } from './ReactFlowSocialSituationExerciseANode/ReactFlowSocialSituationExerciseANode';
 export { default as ReactFlowSocialSituationsNode } from './ReactFlowSocialSituationsNode/ReactFlowSocialSituationsNode';
 export { default as ReactFlowTeoriaDellaMenteNode } from './ReactFlowTeoriaDellaMenteNode/ReactFlowTeoriaDellaMenteNode';
 export { default as ReactFlowTrueFalseNode } from './ReactFlowTrueFalseNode/ReactFlowTrueFalseNode';
 export { default as ReactFlowWatchVideoNode } from './ReactFlowWatchVideoNode/ReactFlowWatchVideoNode';
-export { default as ReactFlowSocialSituationExerciseANode } from './ReactFlowSocialSituationExerciseANode/ReactFlowSocialSituationExerciseANode';

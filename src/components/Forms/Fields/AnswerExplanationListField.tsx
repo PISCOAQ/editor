@@ -134,7 +134,8 @@ const AnswerExplanationListField = ({
 
       {fields.map((f: any, index: number) => {
         const isCorrect = safeCorrectIndex === index;
-        const disableRemove = isDisabled || (keepAtLeastOne && fields.length <= 1);
+        const disableRemove =
+          isDisabled || (keepAtLeastOne && fields.length <= 1);
 
         return (
           <Box

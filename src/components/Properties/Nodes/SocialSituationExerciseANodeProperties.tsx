@@ -1,6 +1,6 @@
 import { Divider } from '@chakra-ui/react';
-import NodeProperties from './NodeProperties';
 import SocialSituationExerciseAEmbedded from '../../Embedded/SocialSituationExerciseANodeEmbedded/SocialSituationExerciseANodeEmbedded';
+import NodeProperties from './NodeProperties';
 
 /**
  * Properties panel for node "SocialSituationExerciseANode".
