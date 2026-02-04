@@ -349,10 +349,11 @@ const useStore = create<ApplicationState>()(
           set((state) =>
             produce(state, (draft) => {
               if (!draft.activeFlowInfo) return;
-              draft.activeFlowInfo = merge<PolyglotFlowInfo>(
-                draft.activeFlowInfo,
-                newValue
-              );
+              draft.activeFlowInfo = {
+                ...draft.activeFlowInfo,
+                ...newValue,
+                tags: (newValue as any).tags ?? draft.activeFlowInfo.tags,
+              };
             })
           );
         },

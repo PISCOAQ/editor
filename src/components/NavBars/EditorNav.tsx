@@ -143,8 +143,6 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
     let missingData = '';
 
     if (flow.description === '') missingData += 'description; ';
-    if (flow.duration === '') missingData += 'duration; ';
-    if (flow.learningContext === '') missingData += 'learning context; ';
 
     // helper: riusa la tua logica esistente
     const validateNodeData = (type: string, data: any): boolean => {

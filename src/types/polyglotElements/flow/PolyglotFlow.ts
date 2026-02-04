@@ -15,9 +15,6 @@ export type PolyglotFlowInfo = {
   };
   description: string;
   tags: { name: string; color: string }[];
-  learningContext: string;
-  duration: string;
-  topics: string[];
   publish: boolean;
   sourceMaterial?: string;
   learning_outcome?: LearningOutcome;

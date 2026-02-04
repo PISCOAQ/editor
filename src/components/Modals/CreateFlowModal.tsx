@@ -1,4 +1,4 @@
-import { AddIcon, CloseIcon, ViewIcon } from '@chakra-ui/icons';
+import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -66,12 +66,10 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
   const [currentTab, setCurrentTab] = useState(0);
   const [flow, setFlow] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [learningContext, setLearningContext] = useState('');
-  const [duration, setDuration] = useState('');
-  const [topicName, setTopicName] = useState('');
-  const [topics, setTopics] = useState<string[]>([]);
+
   const [tagName, setTagName] = useState('');
   const [colorTag, setColorTag] = useState(colors[0]);
   const { isOpen: ioPop, onClose: ocPop, onOpen: opPop } = useDisclosure();
@@ -80,11 +78,40 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
   const toast = useToast();
   const router = useRouter();
 
-  // reset tags on reopen
+  // reset on reopen
   useEffect(() => {
+    if (!isOpen) return;
+
+    setCurrentTab(0);
+    setFlow(undefined);
+    setLoading(false);
+
+    setTitle('');
+    setDescription('');
+
     setColorTag(colors[0]);
     setTags([]);
+    setTagName('');
   }, [isOpen]);
+
+  const normalizedTagName = tagName.trim().toUpperCase();
+
+  const addTag = () => {
+    if (!normalizedTagName) return;
+
+    setTags((prev) => {
+      const exists = prev.some((t) => t.name === normalizedTagName);
+      if (exists) return prev;
+
+      return [...prev, { name: normalizedTagName, color: colorTag }];
+    });
+
+    setTagName('');
+  };
+
+  const removeTagAt = (index: number) => {
+    setTags((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const createFlow = async () => {
     try {
@@ -93,24 +120,25 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
       setLoading(true);
 
       switch (currentTab) {
-        case 0:
+        case 0: {
           const base_Flow: PolyglotFlowInfo = {
-            title: title,
-            description: description,
-            tags: tags,
+            title: title.trim(),
+            description: description.trim(),
+            tags,
             publish: false,
-            duration: duration,
-            learningContext: learningContext,
-            topics: topics,
             topicsAI: [],
+            // non più: duration, learningContext, topics
           };
+
           response = await API.createNewFlow(base_Flow);
           break;
-        case 1:
+        }
+        case 1: {
           if (!flow) return;
           const poly_flow: PolyglotFlow = JSON.parse(flow);
           response = await API.createNewFlowJson(poly_flow);
           break;
+        }
         default:
           console.log('Tab not defined');
           return;
@@ -126,7 +154,9 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
           position: 'bottom-left',
           isClosable: true,
         });
+        return;
       }
+
       router.push('/flows/' + response.data._id);
     } catch (error: any) {
       if ((error as Error).name === 'SyntaxError') {
@@ -140,8 +170,10 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
         });
         return;
       }
+
       console.log(error);
-      if (error.response.status)
+
+      if (error?.response?.status) {
         toast({
           title: 'Server Error',
           description:
@@ -152,7 +184,7 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
           position: 'bottom-left',
           isClosable: true,
         });
-      else
+      } else {
         toast({
           title: 'Generic Error',
           description: 'Try later ' + (error as Error),
@@ -161,10 +193,14 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
           position: 'bottom-left',
           isClosable: true,
         });
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const canCreateCustom =
+    title.trim().length > 0 && description.trim().length > 0;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={'2xl'} isCentered>
@@ -172,6 +208,7 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
       <ModalContent>
         <ModalHeader>Create Flow</ModalHeader>
         <ModalCloseButton />
+
         <ModalBody>
           <Tabs onChange={(index) => setCurrentTab(index)}>
             <TabList>
@@ -187,80 +224,24 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
                   </FormLabel>
                   <Input
                     placeholder="Insert title..."
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setTitle(e.currentTarget.value);
-                    }}
+                    value={title}
+                    onChange={(e) => setTitle(e.currentTarget.value)}
                   />
+
                   <FormLabel my={2} fontWeight={'bold'}>
                     Description:
                   </FormLabel>
                   <Textarea
                     placeholder="Insert description..."
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setDescription(e.currentTarget.value);
-                    }}
+                    value={description}
+                    onChange={(e) => setDescription(e.currentTarget.value)}
                   />
-                  <FormLabel mb={2} fontWeight={'bold'}>
-                    Learning context:
-                  </FormLabel>
-                  <Textarea
-                    placeholder="Insert learning context..."
-                    value={learningContext}
-                    onChange={(e) => setLearningContext(e.currentTarget.value)}
-                  />
-                  <Flex paddingTop={'8px'} align={'center'}>
-                    <FormLabel mb={2} fontWeight={'bold'}>
-                      Topics:
-                    </FormLabel>
-                    <Tooltip
-                      label="Press Enter↵ in the input box to add a topic"
-                      placement="top"
-                    >
-                      <Input
-                        placeholder="Insert topic..."
-                        w={'30%'}
-                        value={topicName}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            setTopics((prev) => {
-                              prev.push(topicName.toUpperCase());
-                              return [...prev];
-                            });
-                            setTopicName('');
-                          }
-                        }}
-                        onChange={(e) => setTopicName(e.currentTarget.value)}
-                      />
-                    </Tooltip>
-                    <IconButton
-                      aria-label="Add Topic"
-                      disabled={!topicName}
-                      icon={<AddIcon />}
-                      rounded="md"
-                      onClick={() => {
-                        setTopics((prev) => {
-                          prev.push(topicName.toUpperCase());
-                          return [...prev];
-                        });
-                        setTopicName('');
-                      }}
-                    />
-                    <FormLabel paddingLeft={'5px'} mb={2} fontWeight={'bold'}>
-                      Duration (Hours):
-                    </FormLabel>
-                    <Input
-                      width={'27%'}
-                      placeholder="Insert duration..."
-                      value={duration}
-                      onChange={(e) => setDuration(e.currentTarget.value)}
-                    />
-                  </Flex>
+
                   <FormLabel my={2} fontWeight={'bold'}>
                     Tags:
                   </FormLabel>
-                  <Flex mb={2}>
+
+                  <Flex mb={2} align="center" gap={2}>
                     <Popover isOpen={ioPop} onClose={ocPop}>
                       <PopoverTrigger>
                         <Button
@@ -271,6 +252,7 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
                           borderColor={'gray.300'}
                         />
                       </PopoverTrigger>
+
                       <Portal>
                         {/* https://github.com/chakra-ui/chakra-ui/issues/3043 */}
                         <Box
@@ -304,6 +286,7 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
                         </Box>
                       </Portal>
                     </Popover>
+
                     <Tooltip
                       label="Press Enter↵ in the input box to add a tag"
                       placement="top"
@@ -314,63 +297,42 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
                         value={tagName}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
-                            setTags((prev) => {
-                              prev.push({
-                                name: tagName.toUpperCase(),
-                                color: colorTag,
-                              });
-                              return [...prev];
-                            });
-                            setTagName('');
+                            e.preventDefault();
+                            addTag();
                           }
                         }}
                         onChange={(e) => setTagName(e.currentTarget.value)}
                       />
                     </Tooltip>
+
                     <IconButton
                       aria-label="Add Tag"
-                      disabled={!tagName}
+                      isDisabled={!normalizedTagName}
                       icon={<AddIcon />}
                       rounded="md"
-                      onClick={() => {
-                        setTags((prev) => {
-                          prev.push({
-                            name: tagName.toUpperCase(),
-                            color: colorTag,
-                          });
-                          return [...prev];
-                        });
-                        setTagName('');
-                      }}
+                      onClick={addTag}
                     />
                   </Flex>
 
-                  {tags.map((tag, id) => (
-                    <Button
-                      key={id}
-                      variant={'unstyled'}
-                      onClick={() =>
-                        setTags((prev) => {
-                          prev.splice(id, 1);
-                          return [...prev];
-                        })
-                      }
-                    >
-                      <Tag
-                        mr={1}
-                        colorScheme={tag.color}
-                        fontWeight="bold"
-                        h={2}
+                  <Flex wrap="wrap" gap={2}>
+                    {tags.map((tag, id) => (
+                      <Button
+                        key={`${tag.name}-${id}`}
+                        variant={'unstyled'}
+                        onClick={() => removeTagAt(id)}
                       >
-                        <TagLeftIcon>
-                          <CloseIcon />
-                        </TagLeftIcon>
-                        <TagLabel>{tag.name}</TagLabel>
-                      </Tag>
-                    </Button>
-                  ))}
+                        <Tag mr={1} colorScheme={tag.color} fontWeight="bold">
+                          <TagLeftIcon>
+                            <CloseIcon />
+                          </TagLeftIcon>
+                          <TagLabel>{tag.name}</TagLabel>
+                        </Tag>
+                      </Button>
+                    ))}
+                  </Flex>
                 </FormControl>
               </TabPanel>
+
               <TabPanel>
                 <Editor
                   height={'500px'}
@@ -390,6 +352,7 @@ const CreateFlowModal = ({ isOpen, onClose, API }: CreateFlowModalProps) => {
             loadingText="Creating"
             colorScheme="blue"
             onClick={createFlow}
+            isDisabled={currentTab === 0 ? !canCreateCustom : false}
           >
             Create
           </Button>

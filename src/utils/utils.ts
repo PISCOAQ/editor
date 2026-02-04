@@ -59,10 +59,7 @@ export const createNewDefaultPolyglotFlow = (): PolyglotFlow => {
     description: '',
     publish: false,
     tags: [],
-    topics: [],
     topicsAI: [],
-    learningContext: '',
-    duration: '0',
     nodes: [],
     edges: [],
   };
