@@ -27,10 +27,12 @@ import { ReactNode, useEffect, useState } from 'react';
 import brandLogo from '../../public/solo_logo.png';
 import useStore from '../../store';
 import { useHasHydrated } from '../../utils/utils';
+import { validateNodeData } from '../../validation';
 import Nav from '../Layout/NavBar';
 import EditFlowModal from '../Modals/EditFlowModal';
 import ExportJsonModal from '../Modals/ExportJsonModal';
 import SaveFlowModal from '../Modals/SaveFlowModal';
+
 type EditorNavProps = {
   saveFunc: () => Promise<void>;
 };
@@ -109,22 +111,6 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
     return true;
   };
 
-  const allowedEmptyFields = [
-    'link',
-    'isAnswerCorrect',
-    'context',
-    'mandatoryTopics',
-    'textToFill',
-    'material',
-    'negativePoints',
-    'positivePoints',
-  ];
-
-  //check for specific types
-  const typeSpecificChecks: Record<string, (data: any) => boolean> = {
-    WatchVideoNode: (data) => isValidField(data.link),
-  };
-
   const checkPublish = (): boolean => {
     if (flow == null) return false;
 
@@ -144,74 +130,24 @@ export default function EditorNav({ saveFunc }: EditorNavProps) {
 
     if (flow.description === '') missingData += 'description; ';
 
-    // helper: riusa la tua logica esistente
-    const validateNodeData = (type: string, data: any): boolean => {
-      if (!data) return false;
-
-      for (const key in data) {
-        if (allowedEmptyFields.includes(key)) continue;
-
-        // Nel ContainerNode "sections" è un array: non ha senso validarlo con isValidField
-        // (che di solito controlla stringhe/valori semplici).
-        if (type === 'ContainerNode' && key === 'sections') continue;
-
-        if (!isValidField(data[key])) return false;
-      }
-
-      if (typeSpecificChecks[type] && !typeSpecificChecks[type](data))
-        return false;
-
-      return true;
-    };
-
     let startingNode = 0;
 
     for (const node of flow.nodes) {
       let infoCheck = true;
 
-      // description del nodo (metadato) — invariato
+      // description del nodo (metadato)
       if (!node.description) infoCheck = false;
 
-      // valida il node.data
-      const data = node.data;
-      if (!validateNodeData(node.type, data)) infoCheck = false;
+      // valida node.data (incluso ContainerNode + figli embedded via validator ricorsivo)
+      const res = validateNodeData(node.type, node.data);
+      if (!res.ok) infoCheck = false;
 
-      // se fallisce -> aggiungi titolo e continua
       if (!infoCheck) {
         missingData += node.title + '; ';
         continue;
       }
 
-      // Se è ContainerNode: valida anche i figli embedded
-      if (node.type === 'ContainerNode') {
-        const sections = node.data?.sections ?? [];
-        for (let s = 0; s < sections.length; s++) {
-          const items = sections[s]?.items ?? [];
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const itemType = item?.type;
-            const itemData = item?.data;
-
-            // Se non abbiamo un type valido -> consideralo missing
-            if (!itemType) {
-              missingData += `${node.title} (section ${s + 1} item ${i + 1}); `;
-              continue;
-            }
-
-            // Valida i dati del figlio con i check del suo tipo
-            // NB: per i figli usiamo item.data (non node.data)
-            const okChild = validateNodeData(itemType, itemData);
-
-            if (!okChild) {
-              // messaggio più chiaro: titolo del figlio se c’è
-              const childLabel = item?.title || itemType;
-              missingData += `${childLabel}; `;
-            }
-          }
-        }
-      }
-
-      // Check if node has at least one incoming edge (solo per nodi del grafo)
+      // Check starting node (solo per nodi del grafo)
       const hasIncomingEdge = flow.edges.some(
         (edge: { reactFlow: { target: any } }) =>
           edge.reactFlow.target === node._id
