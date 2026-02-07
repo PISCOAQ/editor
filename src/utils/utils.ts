@@ -94,7 +94,6 @@ export const createNewDefaultPolyglotNode: (
 const configUnconditionalEdge = [
   'lessonTextNode',
   'WatchVideoNode',
-  'ReadMaterialNode',
   'ScanningNode',
   'MindMapNode',
   'SummaryNode',

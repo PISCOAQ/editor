@@ -8,37 +8,58 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { API } from '../../../data/api';
 
 type Props = {
-  nodeId: string;
-  qid: string;
+  parentNodeId: string;
+  imageId?: string; // valore attuale nel nodo
+  imageIdName: string; // es: "data.questions.0.imageId"
+  isDisabled?: boolean;
 };
 
-const QuestionImageUploadField = ({ nodeId, qid }: Props) => {
+const QuestionImageUploadField = ({
+  parentNodeId,
+  imageId,
+  imageIdName,
+  isDisabled,
+}: Props) => {
+  const toast = useToast();
+  const { setValue } = useFormContext();
+
   const [file, setFile] = useState<File | undefined>(undefined);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
-  const [hasRemote, setHasRemote] = useState<boolean>(false);
-  const [checking, setChecking] = useState<boolean>(false);
-  const toast = useToast();
+  const [checking, setChecking] = useState(false);
+  const [hasRemote, setHasRemote] = useState(false);
 
-  // cleanup preview URL (evita leak)
+  const canUse = useMemo(() => !!parentNodeId, [parentNodeId]);
+
+  // se esiste già una immagine (id nel form) o risulta presente lato server, blocca inserimento nuova
+  const hasImageAlready = useMemo(
+    () => !!imageId || hasRemote,
+    [imageId, hasRemote]
+  );
+
+  // cleanup preview URL
   useEffect(() => {
     return () => {
       if (previewUrl) window.URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
-  // quando entri/rientri nel nodo: verifica se l'immagine esiste già per (nodeId, qid)
+  // quando cambia imageId: aggiorna badge "presente/non presente"
   useEffect(() => {
     let cancelled = false;
 
     const checkRemote = async () => {
-      if (!nodeId || !qid) return;
+      if (!imageId) {
+        setHasRemote(false);
+        return;
+      }
       setChecking(true);
       try {
-        await API.downloadQuestionImage({ nodeId, qid });
+        await API.downloadByFileId({ fileId: imageId });
         if (!cancelled) setHasRemote(true);
       } catch {
         if (!cancelled) setHasRemote(false);
@@ -47,19 +68,38 @@ const QuestionImageUploadField = ({ nodeId, qid }: Props) => {
       }
     };
 
-    // reset preview quando cambiano chiavi
+    // reset preview se cambia immagine
     setPreviewUrl((prev) => {
       if (prev) window.URL.revokeObjectURL(prev);
       return undefined;
     });
 
+    // reset file selezionato quando cambia immagine
+    setFile(undefined);
+
     checkRemote();
     return () => {
       cancelled = true;
     };
-  }, [nodeId, qid]);
+  }, [imageId]);
 
   const onUpload = async () => {
+    if (isDisabled) return;
+
+    // BLOCCO: non permettere una seconda immagine
+    if (hasImageAlready) {
+      toast({
+        title: "C'è già un'immagine",
+        description: 'Elimina prima quella esistente per caricarne un’altra.',
+        status: 'info',
+      });
+      return;
+    }
+
+    if (!canUse) {
+      toast({ title: 'ID nodo non valido', status: 'warning' });
+      return;
+    }
     if (!file) {
       toast({ title: "Seleziona un'immagine", status: 'warning' });
       return;
@@ -78,13 +118,24 @@ const QuestionImageUploadField = ({ nodeId, qid }: Props) => {
       return;
     }
 
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('name', file.name);
-
     try {
-      await API.uploadQuestionImage({ nodeId, qid, file: fd });
+      const resp = await API.uploadImageGeneric({
+        parentNodeId,
+        file,
+      });
+
+      const newImageId = resp.data?.imageId;
+      if (!newImageId) {
+        toast({ title: 'Upload ok ma imageId mancante', status: 'error' });
+        return;
+      }
+
+      // scrive imageId nel nodo (react-hook-form)
+      setValue(imageIdName, newImageId, { shouldDirty: true });
+
       setHasRemote(true);
+      setFile(undefined);
+
       toast({ title: 'Immagine caricata', status: 'success' });
     } catch (e: any) {
       const status = e?.response?.status ?? e?.status;
@@ -99,8 +150,10 @@ const QuestionImageUploadField = ({ nodeId, qid }: Props) => {
   };
 
   const onPreview = async () => {
+    if (!imageId) return;
+
     try {
-      const resp = await API.downloadQuestionImage({ nodeId, qid });
+      const resp = await API.downloadByFileId({ fileId: imageId });
 
       const blob = new Blob([resp.data], {
         type: resp.headers?.['content-type'] || 'image/png',
@@ -123,6 +176,36 @@ const QuestionImageUploadField = ({ nodeId, qid }: Props) => {
     }
   };
 
+  const onDelete = async () => {
+    if (isDisabled) return;
+    if (!imageId) return;
+
+    try {
+      await API.deleteByFileId({ fileId: imageId });
+      // rimuove il riferimento dal nodo
+      setValue(imageIdName, undefined, { shouldDirty: true });
+
+      setHasRemote(false);
+      setFile(undefined);
+
+      setPreviewUrl((prev) => {
+        if (prev) window.URL.revokeObjectURL(prev);
+        return undefined;
+      });
+
+      toast({ title: 'Immagine eliminata', status: 'success' });
+    } catch (e: any) {
+      const status = e?.response?.status ?? e?.status;
+      const msg = e?.response?.data?.message ?? e?.message ?? 'Delete fallito';
+      console.log('DELETE ERROR', { status, msg, e });
+      toast({
+        title: `Eliminazione fallita${status ? ` (${status})` : ''}`,
+        description: msg,
+        status: 'error',
+      });
+    }
+  };
+
   return (
     <Box mt={3}>
       <Flex align="center" justify="space-between" mb={2}>
@@ -140,19 +223,33 @@ const QuestionImageUploadField = ({ nodeId, qid }: Props) => {
         type="file"
         accept="image/png,image/jpeg,image/webp"
         onChange={(e) => setFile(e.target.files?.[0])}
+        isDisabled={isDisabled || !canUse || hasImageAlready}
       />
 
       <Flex gap={2} mt={2}>
-        <Button size="sm" colorScheme="teal" onClick={onUpload}>
+        <Button
+          size="sm"
+          colorScheme="teal"
+          onClick={onUpload}
+          isDisabled={isDisabled || !canUse || hasImageAlready}
+        >
           Carica
         </Button>
         <Button
           size="sm"
           colorScheme="blue"
           onClick={onPreview}
-          isDisabled={!hasRemote}
+          isDisabled={!imageId || !hasRemote}
         >
           Anteprima
+        </Button>
+        <Button
+          size="sm"
+          colorScheme="red"
+          onClick={onDelete}
+          isDisabled={!imageId || isDisabled}
+        >
+          Elimina
         </Button>
       </Flex>
 

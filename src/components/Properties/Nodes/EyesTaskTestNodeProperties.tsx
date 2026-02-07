@@ -22,7 +22,8 @@ const newId = (prefix: string) =>
   `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
 type EyesTaskQuestionForm = {
-  qid?: string;
+  qid?: string; // id logico della domanda
+  imageId?: string; // id immagine (File._id)
   answers?: string[];
   correctIndex?: number;
 };
@@ -41,6 +42,7 @@ const EyesTaskTestNodeProperties = () => {
     name: 'data.questions',
   }) as EyesTaskQuestionForm[] | undefined;
 
+  // nodo selezionato
   const selectedElement = useStore((store: any) => {
     const v = store.getSelectedElement;
     return typeof v === 'function' ? v() : v;
@@ -63,6 +65,7 @@ const EyesTaskTestNodeProperties = () => {
           onClick={() =>
             append({
               qid: newId('q'),
+              imageId: undefined,
               answers: ['', ''],
               correctIndex: 0,
             })
@@ -83,7 +86,7 @@ const EyesTaskTestNodeProperties = () => {
       <Stack spacing={4}>
         {fields.map((field, index) => {
           const base = `data.questions.${index}`;
-          const qid = questions?.[index]?.qid;
+          const imageId = questions?.[index]?.imageId;
 
           return (
             <Box key={field.id} borderWidth="1px" borderRadius="md" p={3}>
@@ -97,37 +100,43 @@ const EyesTaskTestNodeProperties = () => {
                   icon={<CloseIcon />}
                   type="button"
                   onClick={async () => {
-                    const qidToDelete = questions?.[index]?.qid;
+                    const imageIdToDelete = questions?.[index]?.imageId;
 
-                    // se non ho le chiavi, rimuovo solo dal form
-                    if (!nodeId || !qidToDelete) {
-                      remove(index);
-                      return;
+                    // Se c'è un'immagine, prova a cancellarla prima
+                    if (imageIdToDelete) {
+                      try {
+                        await API.deleteByFileId({ fileId: imageIdToDelete });
+                      } catch (e) {
+                        console.error('Delete image failed', e);
+                        toast({
+                          title: 'Immagine non eliminata',
+                          description:
+                            'Non sono riuscito a eliminare l’immagine associata. Riprova o elimina più tardi.',
+                          status: 'warning',
+                          duration: 3500,
+                          position: 'bottom-left',
+                          isClosable: true,
+                        });
+                        // Non rimuovo il quesito per non perdere il riferimento
+                        return;
+                      }
                     }
 
-                    try {
-                      await API.deleteQuestionImage({
-                        nodeId,
-                        qid: qidToDelete,
-                      });
-
-                      // delete ok → rimuovo il quesito
-                      remove(index);
-                    } catch (e) {
-                      // in caso di errore NON rimuovo il quesito
-                      // (così non perdi il riferimento all'immagine)
-                      console.error('Delete question image failed', e);
-                    }
+                    // Delete ok (o nessuna immagine) → rimuovo il quesito
+                    remove(index);
                   }}
                 />
               </Flex>
 
-              {nodeId && qid ? (
-                <QuestionImageUploadField nodeId={nodeId} qid={qid} />
+              {nodeId ? (
+                <QuestionImageUploadField
+                  parentNodeId={nodeId}
+                  imageId={imageId}
+                  imageIdName={`${base}.imageId`}
+                />
               ) : (
                 <Text fontSize="xs" opacity={0.6} mt={2}>
-                  Seleziona il nodo e assicurati che l’ID quesito sia valido per
-                  caricare un’immagine.
+                  Seleziona il nodo per caricare un’immagine.
                 </Text>
               )}
 

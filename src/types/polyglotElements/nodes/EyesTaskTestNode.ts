@@ -6,12 +6,12 @@ import { defaultPolyglotNodeData, NodeData, PolyglotNode } from './Node';
 
 export type EyesTaskQuestion = {
   qid: string;
+  imageId?: string;
   answers: string[]; // 4
   correctIndex: number; // 0..3
 };
 
 export type EyesTaskTestNodeData = NodeData & {
-  minCorrectToPass: number; // NUOVO
   questions: EyesTaskQuestion[];
 };
 

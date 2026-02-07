@@ -251,58 +251,31 @@ export const API = {
     );
   },
 
-  //API for upload and download into database
-  uploadFile: (body: {
-    nodeId: string;
-    file: FormData;
-  }): Promise<AxiosResponse> => {
-    return axiosProgress.post('/api/file/upload/' + body.nodeId, body.file, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+  // API images (S3 + imageId)
+  uploadImageGeneric: (body: {
+    parentNodeId: string;
+    file: File;
+  }): Promise<AxiosResponse<{ imageId: string }>> => {
+    const fd = new FormData();
+    fd.append('file', body.file); // MUST be "file"
+    fd.append('parentNodeId', body.parentNodeId);
+
+    return axiosProgress.post(`/api/file/upload`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
 
-  downloadFile: (body: { nodeId: string }): Promise<AxiosResponse> => {
-    return axiosProgress.get<AxiosResponse>(
-      `/api/file/download/${body.nodeId}`,
-      {
-        responseType: 'blob',
-      }
-    );
+  downloadByFileId: (body: { fileId: string }): Promise<AxiosResponse> => {
+    return axiosProgress.get(`/api/file/${body.fileId}`, {
+      responseType: 'blob',
+    });
   },
 
-  uploadQuestionImage: (body: {
-    nodeId: string;
-    qid: string;
-    file: FormData;
-  }): Promise<AxiosResponse> => {
-    return axiosProgress.post(
-      `/api/file/upload/${body.nodeId}/questions/${body.qid}`,
-      body.file,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    );
+  deleteByFileId: (body: { fileId: string }): Promise<AxiosResponse> => {
+    return axiosProgress.delete(`/api/file/${body.fileId}`);
   },
 
-  downloadQuestionImage: (body: {
-    nodeId: string;
-    qid: string;
-  }): Promise<AxiosResponse> => {
-    return axiosProgress.get(
-      `/api/file/download/${body.nodeId}/questions/${body.qid}`,
-      { responseType: 'blob' }
-    );
-  },
-
-  deleteQuestionImage: (body: {
-    nodeId: string;
-    qid: string;
-  }): Promise<AxiosResponse> => {
-    return axiosProgress.delete(
-      `/api/file/questions/${body.nodeId}/${body.qid}`
-    );
-  },
-
+  // Delete all files belonging to a node (called when deleting a node)
   deleteAllNodeFiles: (body: { nodeId: string }): Promise<AxiosResponse> => {
     return axiosProgress.delete(`/api/file/node/${body.nodeId}`);
   },

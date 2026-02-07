@@ -10,7 +10,6 @@ const config = [
     nodeTypes: [
       'lessonTextNode',
       'WatchVideoNode',
-      'ReadMaterialNode',
       'MindMapNode',
       'SummaryNode',
       'ScanningNode',

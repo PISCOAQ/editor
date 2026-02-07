@@ -10,7 +10,6 @@ export * from './LessonTextNode';
 export * from './MultipleChoiceQuestionNode';
 export * from './Node';
 export * from './OpenQuestionNode';
-export * from './ReadMaterialNode';
 export * from './SocialSituationExerciseANode';
 export * from './SocialSituationsNode';
 export * from './TeoriaDellaMenteNode';
