@@ -9,16 +9,18 @@ import {
   IconButton,
   Select,
   Text,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 import React, { useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
-import TextField from '../../Forms/Fields/TextField';
-import NodeProperties from './NodeProperties';
-
+import { API } from '../../../data/api';
+import useStore from '../../../store';
 import { CONTAINER_NODE_ALLOWED_TYPES } from '../../../types/polyglotElements/nodes/ContainerNode';
 import { embeddedByType } from '../../Embedded/embeddedRegistry';
+import TextField from '../../Forms/Fields/TextField';
+import NodeProperties from './NodeProperties';
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -32,6 +34,7 @@ type SectionBlockProps = {
   onRemoveSection: (sectionIndex: number) => void;
   onOpenItem: (sectionIndex: number, itemIndex: number) => void;
   allowedTypes: readonly string[];
+  containerNodeId?: string;
 };
 
 const SectionBlock = ({
@@ -40,7 +43,9 @@ const SectionBlock = ({
   onRemoveSection,
   onOpenItem,
   allowedTypes,
+  containerNodeId,
 }: SectionBlockProps) => {
+  const toast = useToast();
   const { control, getValues } = useFormContext();
 
   const itemsFA = useFieldArray({
@@ -60,6 +65,51 @@ const SectionBlock = ({
       title: def?.label ?? type,
       data: def?.createDefaultData?.() ?? {},
     });
+  };
+
+  const removeItem = async (itemIndex: number) => {
+    const itemId = getValues(
+      `data.sections.${sectionIndex}.items.${itemIndex}.id`
+    ) as string | undefined;
+
+    // Se non ho ids affidabili, rimuovo e basta (niente cleanup)
+    if (!containerNodeId || !itemId) {
+      itemsFA.remove(itemIndex);
+      return;
+    }
+
+    try {
+      // elimina tutti i file associati a quell'item
+      if ((API as any).deleteItemFiles) {
+        await (API as any).deleteItemFiles({ nodeId: containerNodeId, itemId });
+      }
+
+      // poi rimuovo l'item dal form
+      itemsFA.remove(itemIndex);
+
+      toast({
+        title: 'Nodo rimosso',
+        description: 'File associati eliminati correttamente.',
+        status: 'success',
+        duration: 2500,
+        position: 'bottom-left',
+        isClosable: true,
+      });
+    } catch (e) {
+      console.error('deleteItemFiles error', e);
+      toast({
+        title: 'Impossibile eliminare i file',
+        description:
+          'Non sono riuscito a eliminare i file associati a questo item. Riprova.',
+        status: 'warning',
+        duration: 3500,
+        position: 'bottom-left',
+        isClosable: true,
+      });
+
+      // Scelta UX: NON rimuovo l’item se non ho eliminato i file
+      // (evita orphan files e perdita del riferimento)
+    }
   };
 
   return (
@@ -153,7 +203,7 @@ const SectionBlock = ({
                     colorScheme="red"
                     onClick={(ev) => {
                       ev.stopPropagation();
-                      itemsFA.remove(itemIndex);
+                      void removeItem(itemIndex);
                     }}
                   />
                 </Flex>
@@ -169,6 +219,12 @@ const SectionBlock = ({
 const ContainerNodeProperties = () => {
   const { control, getValues } = useFormContext();
   const [drill, setDrill] = useState<DrillState>({ mode: 'list' });
+
+  const selectedElement = useStore((store: any) => {
+    const v = store.getSelectedElement;
+    return typeof v === 'function' ? v() : v;
+  });
+  const containerNodeId = selectedElement?._id as string | undefined;
 
   const sectionsFA = useFieldArray({
     control,
@@ -190,6 +246,10 @@ const ContainerNodeProperties = () => {
 
     const itemType = getValues(
       `data.sections.${sectionIndex}.items.${itemIndex}.type`
+    ) as string;
+
+    const itemId = getValues(
+      `data.sections.${sectionIndex}.items.${itemIndex}.id`
     ) as string;
 
     const def = embeddedByType[itemType];
@@ -219,9 +279,17 @@ const ContainerNodeProperties = () => {
           <Divider my={3} />
 
           {Embedded ? (
-            <Embedded
-              basePath={`data.sections.${sectionIndex}.items.${itemIndex}.data`}
-            />
+            containerNodeId ? (
+              <Embedded
+                basePath={`data.sections.${sectionIndex}.items.${itemIndex}.data`}
+                parentNodeId={containerNodeId}
+                parentItemId={itemId}
+              />
+            ) : (
+              <Text fontSize="xs" opacity={0.6} mt={2}>
+                Seleziona il nodo container per caricare un’immagine.
+              </Text>
+            )
           ) : (
             <Text color="red.500">
               Tipo embedded non registrato: {String(itemType)}
@@ -262,6 +330,7 @@ const ContainerNodeProperties = () => {
             onOpenItem={(s, i) =>
               setDrill({ mode: 'edit', sectionIndex: s, itemIndex: i })
             }
+            containerNodeId={containerNodeId}
           />
         ))}
       </VStack>

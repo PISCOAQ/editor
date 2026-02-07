@@ -14,6 +14,7 @@ import { API } from '../../../data/api';
 
 type Props = {
   parentNodeId: string;
+  parentItemId?: string; // nuovo (opzionale)
   imageId?: string; // valore attuale nel nodo
   imageIdName: string; // es: "data.questions.0.imageId"
   isDisabled?: boolean;
@@ -21,6 +22,7 @@ type Props = {
 
 const QuestionImageUploadField = ({
   parentNodeId,
+  parentItemId,
   imageId,
   imageIdName,
   isDisabled,
@@ -121,6 +123,7 @@ const QuestionImageUploadField = ({
     try {
       const resp = await API.uploadImageGeneric({
         parentNodeId,
+        parentItemId, // ✅ nuovo
         file,
       });
 

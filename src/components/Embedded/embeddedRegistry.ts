@@ -5,10 +5,13 @@ import emotionIcon from '../../public/mult_choice_icon.png';
 
 import EmotionAttributionAEmbedded from './EmotionAttributionANodeEmbedded/EmotionAttributionANodeEmbedded';
 import EmotionAttributionBEmbedded from './EmotionAttributionBNodeEmbedded/EmotionAttributionBNodeEmbedded';
+import RiconoscimentoEmozioniNodeEmbedded from './RiconoscimentoEmozioniNodeEmbedded/RiconoscimentoEmozioniNodeEmbedded';
 import SocialSituationExerciseAEmbedded from './SocialSituationExerciseANodeEmbedded/SocialSituationExerciseANodeEmbedded';
 
 export type EmbeddedProps = {
   basePath: string;
+  parentNodeId?: string;
+  parentItemId?: string;
   isDisabled?: boolean;
 };
 
@@ -47,6 +50,17 @@ export const embeddedRegistry: EmbeddedDefinition[] = [
           scenarioExplanation: '',
         },
       ],
+    }),
+  },
+  {
+    type: 'RiconoscimentoEmozioniNode',
+    label: 'Riconoscimento Emozioni',
+    icon: emotionIcon.src,
+    component: RiconoscimentoEmozioniNodeEmbedded,
+    createDefaultData: () => ({
+      imageId: undefined,
+      answers: ['', ''],
+      correctIndex: 0,
     }),
   },
   {

@@ -9,6 +9,7 @@ export { default as ReactFlowFauxPasNode } from './ReactFlowFauxPasNode/ReactFlo
 export { default as ReactFlowLessonNode } from './ReactFlowLessonNode/ReactFlowLessonNode';
 export { default as ReactFlowMultipleChoiceQuestionNode } from './ReactFlowMultipleChoiceQuestionNode/ReactFlowMultipleChoiceQuestionNode';
 export { default as ReactFlowOpenQuestionNode } from './ReactFlowOpenQuestionNode/ReactFlowOpenQuestionNode';
+export { default as ReactFlowRiconoscimentoEmozioniNode } from './ReactFlowRiconoscimentoEmozioniNode/ReactFlowRiconoscimentoEmozioniNode';
 export { default as ReactFlowSocialSituationExerciseANode } from './ReactFlowSocialSituationExerciseANode/ReactFlowSocialSituationExerciseANode';
 export { default as ReactFlowSocialSituationsNode } from './ReactFlowSocialSituationsNode/ReactFlowSocialSituationsNode';
 export { default as ReactFlowTeoriaDellaMenteNode } from './ReactFlowTeoriaDellaMenteNode/ReactFlowTeoriaDellaMenteNode';

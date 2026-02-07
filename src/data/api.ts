@@ -254,11 +254,17 @@ export const API = {
   // API images (S3 + imageId)
   uploadImageGeneric: (body: {
     parentNodeId: string;
+    parentItemId?: string; // nuovo opzionale
     file: File;
   }): Promise<AxiosResponse<{ imageId: string }>> => {
     const fd = new FormData();
     fd.append('file', body.file); // MUST be "file"
     fd.append('parentNodeId', body.parentNodeId);
+
+    // aggiungi solo se presente
+    if (body.parentItemId) {
+      fd.append('parentItemId', body.parentItemId);
+    }
 
     return axiosProgress.post(`/api/file/upload`, fd, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -278,5 +284,15 @@ export const API = {
   // Delete all files belonging to a node (called when deleting a node)
   deleteAllNodeFiles: (body: { nodeId: string }): Promise<AxiosResponse> => {
     return axiosProgress.delete(`/api/file/node/${body.nodeId}`);
+  },
+
+  // Delete all files belonging to an item inside a node (container child)
+  deleteItemFiles: (body: {
+    nodeId: string;
+    itemId: string;
+  }): Promise<AxiosResponse> => {
+    return axiosProgress.delete(
+      `/api/file/node/${body.nodeId}/item/${body.itemId}`
+    );
   },
 };
