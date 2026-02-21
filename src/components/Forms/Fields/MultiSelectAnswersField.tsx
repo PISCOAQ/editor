@@ -16,6 +16,11 @@ import {
   useWatch,
 } from 'react-hook-form';
 
+type AnswerValue = {
+  text: string;
+  score: number;
+};
+
 type AnswerRowProps = {
   answersName: string;
   correctIndexes: number[];
@@ -35,30 +40,53 @@ const AnswerRow = ({
 }: AnswerRowProps) => {
   const { control } = useFormContext();
 
-  // Collego l'input alla singola risposta: answersName.idx
   const { field } = useController({
     control,
     name: `${answersName}.${idx}` as any,
-    defaultValue: '',
+    defaultValue: { text: '', score: 0 } satisfies AnswerValue,
   });
 
+  const value: AnswerValue = field.value ?? { text: '', score: 0 };
+
+  const setText = (text: string) => field.onChange({ ...value, text });
+
+  const setScore = (raw: string) => {
+    const n = raw === '' ? 0 : Number(raw);
+    field.onChange({ ...value, score: Number.isFinite(n) ? n : 0 });
+  };
+
   return (
-    <Flex align="center" gap={2}>
-      {/* Checkbox: indica se questa risposta è corretta */}
-      <Checkbox
-        isChecked={correctIndexes.includes(idx)}
-        onChange={() => onToggleCorrect(idx)}
-      />
+    <Flex align="center" gap={3} width="100%">
+      {/* Checkbox (senza riquadro) */}
+      <Flex align="center" justify="center" minW="28px">
+        <Checkbox
+          isChecked={correctIndexes.includes(idx)}
+          onChange={() => onToggleCorrect(idx)}
+        />
+      </Flex>
 
-      {/* Input della risposta */}
-      <Input
-        {...field}
-        value={field.value ?? ''}
-        placeholder={`Answer ${idx + 1}`}
-        onChange={(e) => field.onChange(e.target.value)}
-      />
+      {/* Box: testo risposta (più lungo) */}
+      <Box borderWidth="1px" borderRadius="md" px={3} py={2} flex="1">
+        <Input
+          variant="unstyled"
+          value={value.text ?? ''}
+          placeholder={`Risposta ${idx + 1}`}
+          onChange={(e) => setText(e.target.value)}
+        />
+      </Box>
 
-      {/* Rimozione risposta */}
+      {/* Box: punteggio (più corto) */}
+      <Box borderWidth="1px" borderRadius="md" px={3} py={2} width="80px">
+        <Input
+          variant="unstyled"
+          type="number"
+          value={Number.isFinite(value.score) ? value.score : 0}
+          placeholder="Punti"
+          onChange={(e) => setScore(e.target.value)}
+        />
+      </Box>
+
+      {/* Pulsante rimozione */}
       <IconButton
         aria-label="Remove answer"
         size="sm"
@@ -161,7 +189,7 @@ const MultiSelectAnswersField = ({
         size="xs"
         mt={2}
         leftIcon={<AddIcon />}
-        onClick={() => answersArray.append('')}
+        onClick={() => answersArray.append({ text: '', score: 0 } as any)}
       >
         Add answer
       </Button>

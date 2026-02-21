@@ -4,6 +4,12 @@ import type { ValidationError } from '../generic';
 const isNonEmptyString = (v: unknown) =>
   typeof v === 'string' && v.trim() !== '';
 
+const isFiniteNumber = (v: unknown) =>
+  typeof v === 'number' && Number.isFinite(v);
+
+const isValidAnswer = (a: any) =>
+  a && isNonEmptyString(a.text) && isFiniteNumber(a.score);
+
 export const validateSocialSituationsNode = (data: any): ValidationError[] => {
   const errors: ValidationError[] = [];
 
@@ -53,12 +59,13 @@ export const validateSocialSituationsNode = (data: any): ValidationError[] => {
       if (
         !Array.isArray(answers) ||
         answers.length === 0 ||
-        !answers.every(isNonEmptyString)
+        !answers.every(isValidAnswer)
       ) {
         errors.push({
           label: 'answers',
           path: `data.items.${i}.sections.${j}.answers`,
-          message: 'Inserisci almeno una risposta (non vuota).',
+          message:
+            'Inserisci almeno una risposta (testo non vuoto + score numerico).',
         });
       }
 

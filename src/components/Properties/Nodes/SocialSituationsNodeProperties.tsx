@@ -95,7 +95,8 @@ const ItemEditor = ({ itemIndex, onRemoveItem }: ItemEditorProps) => {
               before: '',
               bold: '',
               after: '',
-              answers: [],
+              // nuovo formato answers
+              answers: [{ text: '', score: 0 }],
               correctIndexes: [],
             })
           }
