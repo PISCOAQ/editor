@@ -14,8 +14,10 @@ service:
   port: 3000
 
 livenessProbe:
-  tcpSocket:
-    port: 3000
+  httpGet:
+    path: /flows
+    port: http
 readinessProbe:
-  tcpSocket:
-    port: 3000
+  httpGet:
+    path: /flows
+    port: http
