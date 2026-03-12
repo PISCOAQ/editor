@@ -14,10 +14,16 @@ service:
   port: 3000
 
 livenessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 10
   httpGet:
     path: /flows
     port: http
 readinessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  failureThreshold: 5
   httpGet:
     path: /flows
     port: http
