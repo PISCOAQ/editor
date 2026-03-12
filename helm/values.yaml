@@ -6,6 +6,10 @@ image:
 httpRoute:
   enabled: false
 
+env:
+  - name: BACK_URL
+    value: https://piscoaq-backend.polyglot-edu.com
+
 service:
   port: 3000
 
