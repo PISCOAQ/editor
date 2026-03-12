@@ -16,7 +16,6 @@ import { createNewDefaultPolyglotFlow } from '../utils/utils';
 import exampleFlows from './exampleData';
 
 const axios = axiosCreate.create({
-  baseURL: process.env.BACK_URL,
   timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
@@ -25,7 +24,6 @@ const axios = axiosCreate.create({
 });
 
 const axiosProgress = axiosCreate.create({
-  baseURL: process.env.BACK_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -44,7 +42,6 @@ export class APIV2 {
     this.redirect401 = false;
     this.error401 = true;
     this.axios = axiosCreate.create({
-      baseURL: process.env.BACK_URL,
       headers: {
         'Content-Type': 'application/json',
         Authorization: access_token ? 'Bearer ' + access_token : '',

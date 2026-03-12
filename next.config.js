@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const DEPLOY_URL = process.env.DEPLOY_URL ?? 'http://localhost:3000';
-const BACK_URL = process.env.BACK_URL || 'http://localhost:5000';
-
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -14,7 +12,6 @@ const nextConfig = {
     AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE,
     AUTH0_SCOPE: process.env.AUTH0_SCOPE,
     DEPLOY_URL: DEPLOY_URL,
-    BACK_URL: BACK_URL,
     TEST_MODE: process.env.TEST_MODE,
   },
   async redirects() {
