@@ -1,15 +1,11 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-};
-
-module.exports = nextConfig;
-
 const DEPLOY_URL = process.env.DEPLOY_URL ?? 'http://localhost:3000';
 const BACK_URL = process.env.BACK_URL || 'http://localhost:5000';
 
-module.exports = {
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  output: 'standalone',
   env: {
     AUTH0_SECRET: process.env.AUTH0_SECRET,
     AUTH0_ISSUER_BASE_URL: process.env.AUTH0_ISSUER_BASE_URL,
@@ -31,3 +27,5 @@ module.exports = {
     ];
   },
 };
+
+module.exports = nextConfig;

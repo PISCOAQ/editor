@@ -29,7 +29,7 @@ COPY . .
 
 RUN TEST_MODE=$TEST_MODE npm run build
 
-# Production image, copy all the files and run next
+# Production image, copy standalone build and run Next.js
 FROM base AS runner
 WORKDIR /app
 
@@ -40,10 +40,10 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy Next.js build and dependencies (non-standalone)
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# Copy standalone build output
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
@@ -52,5 +52,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Run the Next.js server (non-standalone output)
-CMD ["npm", "start"]
+# Run the Next.js standalone server
+CMD ["node", "server.js"]
