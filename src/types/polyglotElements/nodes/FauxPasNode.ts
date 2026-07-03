@@ -4,10 +4,17 @@ import icon from '../../../public/icona_passo.png';
 import { polyglotNodeComponentMapping } from '../elementMapping';
 import { defaultPolyglotNodeData, NodeData, PolyglotNode } from './Node';
 
+export type FauxPasSkipIf = {
+  enabled: boolean;
+  questionIndex: number | null;
+  answerIndex: number | null;
+};
+
 export type FauxPasQuestion = {
   question: string;
   answers: string[];
-  correctIndex: number | null;
+  correctIndex: number;
+  skipIf?: FauxPasSkipIf;
 };
 
 export type FauxPasQuizItem = {

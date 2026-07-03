@@ -1,6 +1,6 @@
 import SocialSituationExerciseANodeProperties from '../../../components/Properties/Nodes/SocialSituationExerciseANodeProperties';
 import { ReactFlowSocialSituationExerciseANode } from '../../../components/ReactFlowNode';
-import icon from '../../../public/assessment_icon.png';
+import icon from '../../../public/icona_persone.png';
 import { polyglotNodeComponentMapping } from '../elementMapping';
 import { defaultPolyglotNodeData, NodeData, PolyglotNode } from './Node';
 

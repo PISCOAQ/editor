@@ -1,5 +1,5 @@
 import { Handle, Position } from 'reactflow';
-import icon from '../../../public/assessment_icon.png';
+import icon from '../../../public/icona_emozioni.png';
 import useStore from '../../../store';
 import { EmotionAttributionANode } from '../../../types/polyglotElements';
 import Card from '../../Card/Card';

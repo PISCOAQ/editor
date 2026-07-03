@@ -1,6 +1,6 @@
 import EmotionAttributionBNodeProperties from '../../../components/Properties/Nodes/EmotionAttributionBNodeProperties';
 import { ReactFlowEmotionAttributionBNode } from '../../../components/ReactFlowNode';
-import icon from '../../../public/icona_ruota.png';
+import icon from '../../../public/icona_emozioni.png';
 import { polyglotNodeComponentMapping } from '../elementMapping';
 import { defaultPolyglotNodeData, NodeData, PolyglotNode } from './Node';
 

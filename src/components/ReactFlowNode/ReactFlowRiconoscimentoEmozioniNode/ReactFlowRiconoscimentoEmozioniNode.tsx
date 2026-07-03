@@ -1,13 +1,9 @@
 import { useTheme } from '@fluentui/react';
 import { Handle, Position } from 'reactflow';
-
+import icon from '../../../public/icona_occhi.png';
 import useStore from '../../../store';
 import Card from '../../Card/Card';
 import { ReactFlowNodeProps } from '../ReactFlowNode';
-
-// Se hai un’icona dedicata, sostituiscila qui.
-// In alternativa puoi riusare un'icona esistente.
-import icon from '../../../public/mult_choice_icon.png';
 
 type ReactFlowRiconoscimentoEmozioniNodeProps = ReactFlowNodeProps & {
   id: string;

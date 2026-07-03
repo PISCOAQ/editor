@@ -1,6 +1,6 @@
 import RiconoscimentoEmozioniNodeProperties from '../../../components/Properties/Nodes/RiconoscimentoEmozioniNodeProperties';
 import { ReactFlowRiconoscimentoEmozioniNode } from '../../../components/ReactFlowNode';
-import icon from '../../../public/mult_choice_icon.png';
+import icon from '../../../public/icona_occhi.png';
 import { polyglotNodeComponentMapping } from '../elementMapping';
 import { defaultPolyglotNodeData, NodeData, PolyglotNode } from './Node';
 

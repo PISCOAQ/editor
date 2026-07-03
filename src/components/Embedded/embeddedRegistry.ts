@@ -1,7 +1,7 @@
 import type React from 'react';
-import socialIcon from '../../public/assessment_icon.png';
-import ruotaIcona from '../../public/icona_ruota.png';
-import emotionIcon from '../../public/mult_choice_icon.png';
+import icon from '../../public/icona_emozioni.png';
+import occhi from '../../public/icona_occhi.png';
+import person from '../../public/icona_persone.png';
 
 import EmotionAttributionAEmbedded from './EmotionAttributionANodeEmbedded/EmotionAttributionANodeEmbedded';
 import EmotionAttributionBEmbedded from './EmotionAttributionBNodeEmbedded/EmotionAttributionBNodeEmbedded';
@@ -27,7 +27,7 @@ export const embeddedRegistry: EmbeddedDefinition[] = [
   {
     type: 'EmotionAttributionANode',
     label: 'Attribuzione delle Emozioni (A)',
-    icon: emotionIcon.src,
+    icon: icon.src,
     component: EmotionAttributionAEmbedded,
     createDefaultData: () => ({
       scenario: '',
@@ -40,7 +40,7 @@ export const embeddedRegistry: EmbeddedDefinition[] = [
   {
     type: 'EmotionAttributionBNode',
     label: 'Attribuzione delle Emozioni (B)',
-    icon: ruotaIcona.src,
+    icon: icon.src,
     component: EmotionAttributionBEmbedded,
     createDefaultData: () => ({
       items: [
@@ -55,7 +55,7 @@ export const embeddedRegistry: EmbeddedDefinition[] = [
   {
     type: 'RiconoscimentoEmozioniNode',
     label: 'Riconoscimento Emozioni',
-    icon: emotionIcon.src,
+    icon: occhi.src,
     component: RiconoscimentoEmozioniNodeEmbedded,
     createDefaultData: () => ({
       imageId: undefined,
@@ -66,7 +66,7 @@ export const embeddedRegistry: EmbeddedDefinition[] = [
   {
     type: 'SocialSituationExerciseANode',
     label: 'Situazione Sociale (A)',
-    icon: socialIcon.src,
+    icon: person.src,
     component: SocialSituationExerciseAEmbedded,
     createDefaultData: () => ({
       scenario: '',

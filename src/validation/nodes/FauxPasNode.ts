@@ -68,20 +68,15 @@ export const validateFauxPasNode = (data: any): ValidationError[] => {
 
       const ci = q?.correctIndex;
 
-      // può essere null (tutte sbagliate)
-      if (ci === null) return;
-
-      // undefined o altro tipo -> errore
       if (!Number.isInteger(ci)) {
         errors.push({
           label: 'correctIndex',
           path: `data.quiz.${qi}.questions.${qj}.correctIndex`,
-          message: 'correctIndex deve essere un numero o null.',
+          message: 'Seleziona una risposta corretta.',
         });
         return;
       }
 
-      // se abbiamo answers, l'indice deve essere valido
       if (Array.isArray(answers) && answers.length > 0) {
         if (ci < 0 || ci >= answers.length) {
           errors.push({
@@ -90,6 +85,68 @@ export const validateFauxPasNode = (data: any): ValidationError[] => {
             message: 'correctIndex fuori range rispetto alle answers.',
           });
         }
+      }
+
+      const skipIf = q?.skipIf;
+
+      if (!skipIf?.enabled) {
+        return;
+      }
+
+      if (qj === 0) {
+        errors.push({
+          label: 'skipIf',
+          path: `data.quiz.${qi}.questions.${qj}.skipIf`,
+          message: 'La prima domanda non può avere una condizione di skip.',
+        });
+        return;
+      }
+
+      const skipQuestionIndex = skipIf?.questionIndex;
+      const skipAnswerIndex = skipIf?.answerIndex;
+
+      if (!Number.isInteger(skipQuestionIndex)) {
+        errors.push({
+          label: 'skipIf.questionIndex',
+          path: `data.quiz.${qi}.questions.${qj}.skipIf.questionIndex`,
+          message: 'Se lo skip è attivo, seleziona una domanda precedente.',
+        });
+        return;
+      }
+
+      if (skipQuestionIndex < 0 || skipQuestionIndex >= qj) {
+        errors.push({
+          label: 'skipIf.questionIndex',
+          path: `data.quiz.${qi}.questions.${qj}.skipIf.questionIndex`,
+          message:
+            'La condizione di skip può riferirsi solo a una domanda precedente.',
+        });
+        return;
+      }
+
+      const previousQuestion = questions[skipQuestionIndex];
+      const previousAnswers = previousQuestion?.answers;
+
+      if (!Number.isInteger(skipAnswerIndex)) {
+        errors.push({
+          label: 'skipIf.answerIndex',
+          path: `data.quiz.${qi}.questions.${qj}.skipIf.answerIndex`,
+          message: 'Se lo skip è attivo, seleziona una risposta precedente.',
+        });
+        return;
+      }
+
+      if (
+        !Array.isArray(previousAnswers) ||
+        skipAnswerIndex < 0 ||
+        skipAnswerIndex >= previousAnswers.length
+      ) {
+        errors.push({
+          label: 'skipIf.answerIndex',
+          path: `data.quiz.${qi}.questions.${qj}.skipIf.answerIndex`,
+          message:
+            'La risposta selezionata per lo skip non esiste nella domanda precedente.',
+        });
       }
     });
   });

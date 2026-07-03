@@ -1,5 +1,5 @@
 import { Handle, Position } from 'reactflow';
-import icon from '../../../public/assessment_icon.png';
+import icon from '../../../public/icona_persone.png';
 import useStore from '../../../store';
 import { SocialSituationExerciseANode } from '../../../types/polyglotElements';
 import Card from '../../Card/Card';
